@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <title>Spring Client Demo</title>
+    <!-- Bootstrap -->
+    <link href="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/fontawesome-all.min.css" rel="stylesheet">
+    
+    <script async src="/npm/es-module-shims"></script>
+  </head>
+  <body>
+    
+    
+<!-- Включаємо файл з панеллю навігації -->
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <!-- Логотип або назва сайту -->
+    <a class="navbar-brand" href="/list">Реєстр</a>
+    <!-- Кнопка для перемикання навігаційної панелі на мобільних пристроях -->
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <!-- Основний блок навігаційної панелі, який буде показуватися або ховатися при натисканні на кнопку -->
+    <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav">
+            <!-- Пункт меню для пошуку, який буде активним, якщо поточна сторінка є "index" -->
+            <li class="nav-item active">
+                <a class="nav-link" href="/">Пошук<span class="sr-only">(current)</span></a>
+            </li>
+            <!-- Пункт меню для створення запису, який буде активним, якщо поточна сторінка є "create" -->
+            <li class="nav-item ">
+                <a class="nav-link" href="/create">Створення запису</a>
+            </li>
+            <!-- Пункт меню для сторінки ASIC контейнерів, який буде активним, якщо поточна сторінка є "files" -->
+            <li class="nav-item ">
+                <a class="nav-link" href="/files">Сторінка ASIC контейнерів</a>
+            </li>
+            <!-- Пункт меню для сторінки сертифікатів, який буде активним, якщо поточна сторінка є "certs" -->
+            <li class="nav-item ">
+                <a class="nav-link" href="/certs">Сертифікати</a>
+            </li>
+        </ul>
+    </div>
+</nav>
+
+<div class="container mt-5">
+    <!-- Заголовок сторінки -->
+    <h2>Пошук у БД</h2>
+    <!-- Форма для пошуку в базі даних -->
+    <form class="container">
+        <!-- Група елементів форми для вибору поля пошуку -->
+        <div class="form-group">
+            <label for="search-field">Оберіть поле для пошуку</label>
+            <!-- Випадаючий список для вибору поля пошуку -->
+            <select class="form-control" id="search-field" name="search_field" required>
+                <option value="name">Імʼя</option>
+                <option value="surname">Прізвище</option>
+                <option value="dateOfBirth">Дата народження</option>
+                <option value="passportNumber">Номер паспорту</option>
+                <option value="unzr">УНЗР</option>
+                <option value="rnokpp">РНОКПП</option>
+            </select>
+        </div>
+        <!-- Група елементів форми для введення значення пошуку -->
+        <div class="form-group">
+            <label for="search-value">Значення для пошуку</label>
+            <!-- Текстове поле для введення значення пошуку -->
+            <input type="text" class="form-control" id="search-value" name="search_value" required>
+        </div>
+        <!-- Кнопка для відправки форми -->
+        <button type="button" class="btn btn-primary" id="searchButton" onclick="searchPersons()">Пошук</button>  
+    </form>
+
+    <!-- Блок для повідомлень -->
+    <div id="messageBox" class="alert" role="alert" style="display: none;"></div>
+    
+</div>
+        
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
+    <script src="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+  </body>
+</html>
+
+<script>
+    function searchPersons() {
+
+    let itemList = document.getElementById("search-field");
+    const searchValue = document.getElementById('search-value').value;
+    const messageBox = document.getElementById('messageBox');
+
+    let collection = itemList.selectedOptions;
+    let searchKeyLabel = collection[0].label;
+    
+    console.log("Your choice is: "+searchKeyLabel);
+    console.log("Search for: "+searchValue);
+
+    let searchKey = "";
+    
+    if(searchKeyLabel==="УНЗР"){
+        searchKey = "unzr";
+    }else if(searchKeyLabel==="Імʼя"){
+        searchKey = "firstName";
+    }else if(searchKeyLabel==="Прізвище"){
+        searchKey = "lastName";
+    }else if(searchKeyLabel==="Дата народження"){
+        searchKey = "birthDate";
+    }else if(searchKeyLabel==="Номер паспорту"){
+        searchKey = "pasport";
+    }else {
+        searchKey = "rnokpp";
+    }
+    console.log("Search key: "+searchKey);
+
+    fetch('/search', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'aplication/json'
+        },
+        body: JSON.stringify({ searchKey: searchKey,searchValue: searchValue})
+    })
+    .then((response) => response.text())
+    .then((text) => {
+        
+    //    if (response.status === 200) {
+        console.log(text);
+            document.write(text);
+    //        }
+    //        else {
+    //        response.json().then(data => {
+    //            messageBox.textContent = `Виникла помилка: ${JSON.stringify(data)}`;  // Повідомлення про помилку
+    //            messageBox.className = 'alert alert-danger';
+    //            messageBox.style.display = 'block';
+    //        });
+    //    }
+    })
+    .catch(error => {
+        messageBox.textContent = `Виникла помилка: ${error.message}`;  // Повідомлення про помилку
+        messageBox.className = 'alert alert-danger';
+        messageBox.style.display = 'block';
+    });
+    
+
+}
+
+</script>

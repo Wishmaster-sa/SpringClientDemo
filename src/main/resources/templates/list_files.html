@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title></title>
+    <!-- Bootstrap -->
+    <link href="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/fontawesome-all.min.css" rel="stylesheet">
+  </head>
+  
+  
+<body>
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <!-- Логотип або назва сайту -->
+    <a class="navbar-brand" href="/list">Реєстр</a>
+    <!-- Кнопка для перемикання навігаційної панелі на мобільних пристроях -->
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <!-- Основний блок навігаційної панелі, який буде показуватися або ховатися при натисканні на кнопку -->
+    <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav">
+            <!-- Пункт меню для пошуку, який буде активним, якщо поточна сторінка є "index" -->
+            <li class="nav-item ">
+                <a class="nav-link" href="/">Пошук<span class="sr-only">(current)</span></a>
+            </li>
+            <!-- Пункт меню для створення запису, який буде активним, якщо поточна сторінка є "create" -->
+            <li class="nav-item ">
+                <a class="nav-link" href="/create">Створення запису</a>
+            </li>
+            <!-- Пункт меню для сторінки ASIC контейнерів, який буде активним, якщо поточна сторінка є "files" -->
+            <li class="nav-item active">
+                <a class="nav-link" href="/files">Сторінка ASIC контейнерів</a>
+            </li>
+            <!-- Пункт меню для сторінки сертифікатів, який буде активним, якщо поточна сторінка є "certs" -->
+            <li class="nav-item ">
+                <a class="nav-link" href="/certs">Сертифікати</a>
+            </li>
+        </ul>
+    </div>
+</nav>  <!-- Включаємо навігаційну панель -->
+
+<div class="container mt-5">
+    <h1 class="mb-4">Список файлів</h1>  <!-- Заголовок для сторінки зі списком файлів -->
+    <table class="table table-striped">  <!-- Таблиця для відображення файлів зі стилем "смугаста таблиця" -->
+        <thead>
+            <tr>
+                <th scope="col">Імʼя файлу</th>  <!-- Заголовок колонки для імен файлів -->
+                <th scope="col">Дата і час створення</th>  <!-- Заголовок колонки для дати і часу створення файлів -->
+                <th scope="col">Дії</th>  <!-- Заголовок колонки для дій -->
+            </tr>
+        </thead>
+        <tbody>
+            {% for file in files %}  <!-- Цикл для проходження по всіх файлах -->
+            <tr>
+                <td>{{ file.name }}</td>  <!-- Відображаємо ім'я файлу -->
+                <td>{{ file.creation_time }}</td>  <!-- Відображаємо дату і час створення файлу -->
+                <td>
+                    <a href="{{ url_for('download_file', filename=file.name) }}" class="btn btn-primary">Скачати</a>  <!-- Посилання для завантаження файлу -->
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <button class="btn btn-primary" onclick="history.back()">Назад</button>  <!-- Кнопка для повернення на попередню сторінку -->
+</div>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
+    <script src="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+  </body>
+</html>

@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title></title>
+    <!-- Bootstrap -->
+    <link href="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/fontawesome-all.min.css" rel="stylesheet">
+    <script type="importmap">
+            {
+                    "imports": {
+                            "bootstrap": "/npm/bootstrap",
+                            "@popperjs/core": "/npm/@popperjs/core",
+                            "htmx": "/npm/htmx.org"
+                    }
+            }
+    </script>
+    <script type="module">
+            import { Toast } from 'bootstrap';
+            import 'htmx';
+            htmx.on("notice", (e) => {
+                    document.getElementById("toast-body").innerText = e.detail.value;
+                    new Toast(document.getElementById("toast"), { delay: 2000 }).show();
+            });
+    </script>
+  </head>
+  
+  
+<body>
+  
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <!-- Логотип або назва сайту -->
+    <a class="navbar-brand" href="/">Реєстр</a>
+    <!-- Кнопка для перемикання навігаційної панелі на мобільних пристроях -->
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <!-- Основний блок навігаційної панелі, який буде показуватися або ховатися при натисканні на кнопку -->
+    <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav">
+            <!-- Пункт меню для пошуку, який буде активним, якщо поточна сторінка є "index" -->
+            <li class="nav-item ">
+                <a class="nav-link" href="/">Пошук<span class="sr-only">(current)</span></a>
+            </li>
+            <!-- Пункт меню для створення запису, який буде активним, якщо поточна сторінка є "create" -->
+            <li class="nav-item active">
+                <a class="nav-link" href="/create">Створення запису</a>
+            </li>
+            <!-- Пункт меню для сторінки ASIC контейнерів, який буде активним, якщо поточна сторінка є "files" -->
+            <li class="nav-item ">
+                <a class="nav-link" href="/files">Сторінка ASIC контейнерів</a>
+            </li>
+            <!-- Пункт меню для сторінки сертифікатів, який буде активним, якщо поточна сторінка є "certs" -->
+            <li class="nav-item ">
+                <a class="nav-link" href="/certs">Сертифікати</a>
+            </li>
+        </ul>
+    </div>
+</nav>  <!-- Включаємо навігаційну панель -->
+
+<div class="position-fixed top-0 end-0 p-3">
+        <div id="toast" class="toast align-items-center text-white bg-success border-0" role="alert">
+                <div class="d-flex">
+                        <div id="toast-body" class="toast-body"></div>
+                        <button type="button" class="btn-close btn-close-white me-2 m-auto"
+                                data-bs-dismiss="toast"></button>
+                </div>
+        </div>
+</div>
+
+<div class="container mt-5">
+    <div id="messageBox" style="display: none;"></div>  <!-- Поле для відображення повідомлень -->
+
+    <h2>Створення нового запису</h2>
+    <form id="createForm" method="POST" action="/create">
+        <div class="form-group">
+            <label for="firstName">Імʼя</label>
+            <input type="text" class="form-control" id="firstName" name="firstName" required>  <!-- Поле для введення імені -->
+        </div>
+        <div class="form-group">
+            <label for="lastName">Прізвище</label>
+            <input type="text" class="form-control" id="lastName" name="lastName" required>  <!-- Поле для введення прізвища -->
+        </div>
+        <div class="form-group">
+            <label for="patronymic">По батькові</label>
+            <input type="text" class="form-control" id="patronymic" name="patronymic" required>  <!-- Поле для введення по батькові -->
+        </div>
+        <div class="form-group">
+            <label for="gender">Стать</label>
+            <select class="form-control" id="gender" name="gender" required>  <!-- Поле для вибору статі -->
+                <option value="male">Чоловіча</option>
+                <option value="female">Жіноча</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="birthDate">Дата народження</label>
+            <input type="date" class="form-control" id="birthDate" name="birthDate" required>  <!-- Поле для введення дати народження -->
+        </div>
+        <div class="form-group">
+            <label for="pasport">Номер паспорту</label>
+            <input type="text" class="form-control" id="pasport" name="pasport" required>  <!-- Поле для введення номеру паспорту -->
+        </div>
+        <div class="form-group">
+            <label for="unzr">УНЗР</label>
+            <input type="text" class="form-control" id="unzr" name="unzr" required>  <!-- Поле для введення УНЗР -->
+        </div>
+        <div class="form-group">
+            <label for="rnokpp">РНОКПП</label>
+            <input type="text" class="form-control" id="rnokpp" name="rnokpp" required>  <!-- Поле для введення РНОКПП -->
+        </div>
+        <button type="submit" class="btn btn-primary">Створити запис</button>  <!-- Кнопка для відправки форми -->
+    </form>
+</div>
+
+<div class="container">
+        <button class="btn btn-primary" hx-get="/test" hx-swap="none">Fetch</button>
+        <button class="btn btn-primary" hx-get="/notify" hx-swap="none">Notify!</button>
+</div>
+
+
+<script>
+document.getElementById('createForm').addEventListener('submit', function(event) {
+    event.preventDefault();  // Запобігаємо стандартному відправленню форми
+
+    const form = event.target;
+    const formData = new FormData(form);
+    const messageBox = document.getElementById('messageBox');
+    const formObject = {};
+
+    formData.forEach((value, key) => {
+        formObject[key] = value;  // Збираємо дані форми у форматі об'єкта
+    });
+
+    fetch(form.action, {
+        method: form.method,
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formObject),  // Перетворюємо дані форми у JSON та надсилаємо на сервер
+    })
+    .then(response => {
+        if (response.status === 200) {
+            response.json().then(data => {
+                if(data.status===true){
+                    messageBox.textContent = `Запис успішно створено!`;  // Відображаємо повідомлення про успіх
+                    messageBox.className = 'alert alert-success';
+                    messageBox.style.display = 'block';
+                }else{
+                    messageBox.textContent = `Виникла помилка: ${data.descr}`;  // Відображаємо повідомлення про помилку
+                    messageBox.className = 'alert alert-danger';
+                    messageBox.style.display = 'block';
+                }
+            });
+        } else if (response.status === 422) {
+            response.json().then(data => {
+                messageBox.textContent = `Виникла помилка: ${JSON.stringify(data)}`;  // Відображаємо повідомлення про помилку
+                messageBox.className = 'alert alert-danger';
+                messageBox.style.display = 'block';
+            });
+        }
+    })
+    .catch(error => {
+        messageBox.textContent = `Виникла помилка: ${error.message}`;  // Відображаємо повідомлення про помилку у разі проблеми з запитом
+        messageBox.className = 'alert alert-danger';
+        messageBox.style.display = 'block';
+    });
+});
+</script>
+
+
+    
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
+    <script src="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+  </body>
+</html>

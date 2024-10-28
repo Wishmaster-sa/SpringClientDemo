@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title></title>
+    <!-- Bootstrap -->
+    <link href="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/fontawesome-all.min.css" rel="stylesheet">
+  </head>
+  
+  
+<body>
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <!-- Логотип або назва сайту -->
+    <a class="navbar-brand" href="/list">Реєстр</a>
+    <!-- Кнопка для перемикання навігаційної панелі на мобільних пристроях -->
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <!-- Основний блок навігаційної панелі, який буде показуватися або ховатися при натисканні на кнопку -->
+    <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav">
+            <!-- Пункт меню для пошуку, який буде активним, якщо поточна сторінка є "index" -->
+            <li class="nav-item active">
+                <a class="nav-link" href="/">Пошук<span class="sr-only">(current)</span></a>
+            </li>
+            <!-- Пункт меню для створення запису, який буде активним, якщо поточна сторінка є "create" -->
+            <li class="nav-item ">
+                <a class="nav-link" href="/create">Створення запису</a>
+            </li>
+            <!-- Пункт меню для сторінки ASIC контейнерів, який буде активним, якщо поточна сторінка є "files" -->
+            <li class="nav-item ">
+                <a class="nav-link" href="/files">Сторінка ASIC контейнерів</a>
+            </li>
+            <!-- Пункт меню для сторінки сертифікатів, який буде активним, якщо поточна сторінка є "certs" -->
+            <li class="nav-item ">
+                <a class="nav-link" href="/certs">Сертифікати</a>
+            </li>
+        </ul>
+    </div>
+</nav>  <!-- Включаємо навігаційну панель -->
+
+<div class="container mt-5">
+    <h1 class="mb-4">Картки</h1>  <!-- Заголовок для сторінки з картками -->
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th scope="col">Ім'я</th>
+                <th scope="col">Прізвище</th>
+                <th scope="col">По батькові</th>
+                <th scope="col">УНЗР</th>
+                <th scope="col">Дії</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!--@PersonsTable-->
+        </tbody>
+    </table>
+    <button class="btn btn-primary" onclick="history.back()">Назад</button>  <!-- Кнопка для повернення на попередню сторінку -->
+</div>
+
+<!-- Модальне вікно для відображення та редагування докладної інформації -->
+<div class="modal fade" id="detailsModal" tabindex="-1" role="dialog" aria-labelledby="detailsModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="detailsModalLabel">Детальна інформація</h5>  <!-- Заголовок модального вікна -->
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="detailsForm">
+                    <div class="form-group">
+                        <label for="detailName">Ім'я</label>
+                        <input type="text" class="form-control" id="detailName" disabled>  <!-- Поле для відображення імені -->
+                    </div>
+                    <div class="form-group">
+                        <label for="detailSurname">Прізвище</label>
+                        <input type="text" class="form-control" id="detailSurname" disabled>  <!-- Поле для відображення прізвища -->
+                    </div>
+                    <div class="form-group">
+                        <label for="detailPatronym">По батькові</label>
+                        <input type="text" class="form-control" id="detailPatronym" disabled>  <!-- Поле для відображення по батькові -->
+                    </div>
+                    <div class="form-group">
+                        <label for="detailDateOfBirth">Дата народження</label>
+                        <input type="text" class="form-control" id="detailDateOfBirth" disabled>  <!-- Поле для відображення дати народження -->
+                    </div>
+                    <div class="form-group">
+                        <label for="detailGender">Стать</label>
+                        <select class="form-control" id="detailGender" disabled>  <!-- Поле для відображення статі -->
+                            <option value="male">Чоловіча</option>
+                            <option value="female">Жіноча</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="detailRnokpp">РНОКПП</label>
+                        <input type="text" class="form-control" id="detailRnokpp" disabled>  <!-- Поле для відображення РНОКПП -->
+                    </div>
+                    <div class="form-group">
+                        <label for="detailPassportNumber">Номер паспорту</label>
+                        <input type="text" class="form-control" id="detailPassportNumber" disabled>  <!-- Поле для відображення номера паспорту -->
+                    </div>
+                    <div class="form-group">
+                        <label for="detailUnzr">УНЗР</label>
+                        <input type="text" class="form-control" id="detailUnzr" disabled>  <!-- Поле для відображення УНЗР -->
+                    </div>
+                </form>
+                <!-- Блок для повідомлень -->
+                <div id="messageBox" class="alert" role="alert" style="display: none;"></div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Закрити</button>  <!-- Кнопка для закриття модального вікна -->
+                <button type="button" class="btn btn-primary" id="editButton" onclick="editDetails()">Редагувати</button>  <!-- Кнопка для редагування -->
+                <button type="button" class="btn btn-danger" id="deleteButton" onclick="deleteItem()">Видалити</button>  <!-- Кнопка для видалення -->
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+let currentItemId;  // Змінна для збереження поточного ID елемента
+
+function showDetails(id) {
+    console.log(id);
+    currentItemId = id;  // Збереження ID поточного елемента
+    const item = @dataToJson;  // Отримання даних елементів у форматі JSON
+    console.log(id);
+    const details = item.find(x => x.id === id);  // Знаходження потрібного елемента за ID
+
+    // Заповнення полів форми деталями елемента
+    document.getElementById('detailName').value = details.firstName;
+    document.getElementById('detailSurname').value = details.lastName;
+    document.getElementById('detailPatronym').value = details.patronymic;
+    document.getElementById('detailDateOfBirth').value = details.birthDate;
+    //document.getElementById('detailGender').value = details.gender;
+    document.getElementById('detailRnokpp').value = details.rnokpp;
+    document.getElementById('detailPassportNumber').value = details.pasport;
+    document.getElementById('detailUnzr').value = details.unzr;
+
+    document.getElementById('editButton').textContent = 'Редагувати';  // Встановлення тексту кнопки редагування
+    toggleFields(false);  // Блокуємо поля форми
+
+    // Приховування блоку повідомлень
+    const messageBox = document.getElementById('messageBox');
+    messageBox.style.display = 'none';
+    messageBox.className = 'alert';
+
+    $('#detailsModal').modal('show');  // Відображення модального вікна
+}
+
+function editDetails() {
+    const editButton = document.getElementById('editButton');
+    const isEditing = editButton.textContent === 'Зберегти';
+
+    if (isEditing) {
+        // Збереження змін
+        const updatedItem = {
+            id: currentItemId,
+            firstName: document.getElementById('detailName').value,
+            lastName: document.getElementById('detailSurname').value,
+            patronymic: document.getElementById('detailPatronym').value,
+            birthDate: document.getElementById('detailDateOfBirth').value,
+            gender: document.getElementById('detailGender').value,
+            rnokpp: document.getElementById('detailRnokpp').value,
+            pasport: document.getElementById('detailPassportNumber').value,
+            unzr: document.getElementById('detailUnzr').value,
+        };
+
+        // Відправка оновлених даних на сервер
+        fetch('/update', {
+            method: 'PATCH',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(updatedItem),
+        })
+        .then(response => {
+            const messageBox = document.getElementById('messageBox');
+            if (response.status === 200) {
+                response.json().then(data => {
+                    if(data.status===true){
+                        messageBox.textContent = `Дані оновлено!`;  // Відображаємо повідомлення про успіх
+                        messageBox.className = 'alert alert-success';
+                        messageBox.style.display = 'block';
+                    }else{
+                        messageBox.textContent = `Виникла помилка: ${data.descr}`;  // Відображаємо повідомлення про помилку
+                        messageBox.className = 'alert alert-danger';
+                        messageBox.style.display = 'block';
+                    }
+                });
+            } else if (response.status === 204) {
+                messageBox.textContent = 'Дані не потребують оновлення';  // Повідомлення про відсутність змін
+                messageBox.className = 'alert alert-info';
+                messageBox.style.display = 'block';
+            } else {
+                response.json().then(data => {
+                    messageBox.textContent = `Виникла помилка: ${JSON.stringify(data)}`;  // Повідомлення про помилку
+                    messageBox.className = 'alert alert-danger';
+                    messageBox.style.display = 'block';
+                });
+            }
+        })
+        .catch(error => {
+            const messageBox = document.getElementById('messageBox');
+            messageBox.textContent = `Виникла помилка: ${error.message}`;  // Повідомлення про помилку
+            messageBox.className = 'alert alert-danger';
+            messageBox.style.display = 'block';
+        });
+
+    } else {
+        // Переключення в режим редагування
+        editButton.textContent = 'Зберегти';
+        toggleFields(true);  // Розблокування полів форми
+    }
+}
+
+function deleteItem() {
+    const rnokpp = document.getElementById('detailRnokpp').value;
+
+    // Відправка запиту на видалення
+    fetch('/delete', {
+        method: 'DELETE',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ rnokpp: rnokpp })
+    })
+    .then(response => {
+        const messageBox = document.getElementById('messageBox');
+        if (response.status === 200) {
+            response.json().then(data => {
+                    if(data.status===true){
+                        messageBox.textContent = `Дані видалено!`;  // Відображаємо повідомлення про успіх
+                        messageBox.className = 'alert alert-success';
+                        messageBox.style.display = 'block';
+                    }else{
+                        messageBox.textContent = `Виникла помилка: ${data.descr}`;  // Відображаємо повідомлення про помилку
+                        messageBox.className = 'alert alert-danger';
+                        messageBox.style.display = 'block';
+                    }
+            });
+        } else {
+            response.json().then(data => {
+                messageBox.textContent = `Виникла помилка: ${JSON.stringify(data)}`;  // Повідомлення про помилку
+                messageBox.className = 'alert alert-danger';
+                messageBox.style.display = 'block';
+            });
+        }
+    })
+    .catch(error => {
+        const messageBox = document.getElementById('messageBox');
+        messageBox.textContent = `Виникла помилка: ${error.message}`;  // Повідомлення про помилку
+        messageBox.className = 'alert alert-danger';
+        messageBox.style.display = 'block';
+    });
+}
+
+function toggleFields(enable) {
+    document.getElementById('detailName').disabled = !enable;
+    document.getElementById('detailSurname').disabled = !enable;
+    document.getElementById('detailPatronym').disabled = !enable;
+    document.getElementById('detailDateOfBirth').disabled = !enable;
+    document.getElementById('detailGender').disabled = !enable;
+    document.getElementById('detailRnokpp').disabled = !enable;
+    document.getElementById('detailPassportNumber').disabled = !enable;
+    document.getElementById('detailUnzr').disabled = !enable;
+}
+</script>
+
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
+    <script src="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+  </body>
+</html>
+
