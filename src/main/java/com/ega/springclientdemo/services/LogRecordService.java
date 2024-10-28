@@ -5,6 +5,7 @@
 package com.ega.springclientdemo.services;
 
 import com.ega.springclientdemo.interfaces.LogRecordInterface;
+import com.ega.springclientdemo.models.AppSettings;
 import com.ega.springclientdemo.models.LogRecord;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -23,23 +24,25 @@ import org.springframework.stereotype.Component;
 public class LogRecordService implements LogRecordInterface{
     //ініціалізація файлу налаштувань
     
-    @Value("${webclient.settings.logfilename:client.log}")
+    //@Value("${webclient.settings.logfilename:client.log}")
     //повний шлях до файлу лога
-    private String logFileName;
+    //private String logFileName;
 
-    @Value("${webclient.settings.loglevel:0}") 
+    //@Value("${webclient.settings.loglevel:0}") 
     //рівень логування.
-    private int logLevel;
+    //private int logLevel;
 
+    
+    
     @Override
     public Boolean addRecord(LogRecord record) {
     //    System.out.println("logFileName = "+logFileName+"\nLogLevel = "+logLevel);
         
-        switch(logLevel){
-            case 0 -> AddRecordLevel0(record); //немає логування
-            case 1 -> AddRecordLevel1(record); //тільки помилки
-            case 2 -> AddRecordLevel2(record); //всі повідомлення, але без тіла запиту та без тіла відповіді.
-            case 3 -> AddRecordLevel3(record); //повний лог.
+        switch(AppSettings.LOG_LEVEL){
+            case "0" -> AddRecordLevel0(record); //немає логування
+            case "1" -> AddRecordLevel1(record); //тільки помилки
+            case "2" -> AddRecordLevel2(record); //всі повідомлення, але без тіла запиту та без тіла відповіді.
+            case "3" -> AddRecordLevel3(record); //повний лог.
         }
         
         return true;
@@ -74,13 +77,13 @@ public class LogRecordService implements LogRecordInterface{
     private void WriteDataToLogFile(String toString) {
         BufferedWriter writer;
         try {
-            File f = new File(logFileName);
+            File f = new File(AppSettings.LOG_FILENAME);
             if(f.exists() && !f.isDirectory()) { 
-                writer = new BufferedWriter(new FileWriter(logFileName, true));
+                writer = new BufferedWriter(new FileWriter(AppSettings.LOG_FILENAME, true));
                 writer.append(toString+"\n");
                 writer.close();
             }else{
-                writer = new BufferedWriter(new FileWriter(logFileName, true));
+                writer = new BufferedWriter(new FileWriter(AppSettings.LOG_FILENAME, true));
                 writer.write(toString);
                 writer.close();
             }

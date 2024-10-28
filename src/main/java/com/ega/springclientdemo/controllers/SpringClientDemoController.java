@@ -4,36 +4,26 @@
  */
 package com.ega.springclientdemo.controllers;
 
-import com.ega.springclientdemo.HttpRequestUtils;
 import com.ega.springclientdemo.WebConfig;
 import com.ega.springclientdemo.interfaces.SpringClientDemoInterface;
 import com.ega.springclientdemo.models.Answer;
-import com.ega.springclientdemo.models.Greeting;
-import com.ega.springclientdemo.models.LogRecord;
 import com.ega.springclientdemo.models.Persona;
 import com.ega.springclientdemo.services.SpringClientDemoService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
-import java.util.stream.Collectors;
-import javax.management.Query;
 import org.json.JSONObject;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 /**
@@ -54,13 +44,6 @@ public class SpringClientDemoController {
                 this.service = new SpringClientDemoService(webClient.getWebClient());                
 	}
         
-        @PostMapping("/test")
-        //test
-	public String test(@ModelAttribute("queryForm") Query query, Map<String, Object> model){
-            System.out.println(query.toString());
-            return "Fred";
-	}
-
         @GetMapping("/create")
         //перехід до сторинкі створення персони
 	public String viewCreateForm() throws FileNotFoundException{

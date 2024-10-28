@@ -4,7 +4,6 @@
  */
 package com.ega.springclientdemo.services;
 
-import com.ega.springclientdemo.HttpRequestUtils;
 import com.ega.springclientdemo.WebConfig;
 import com.ega.springclientdemo.interfaces.SpringClientDemoInterface;
 import com.ega.springclientdemo.models.Answer;
@@ -26,20 +25,13 @@ import org.springframework.web.reactive.function.client.WebClient;
 
 /**
  *
- * @author parallels
+ * @author sa
  */
 @Service
 public class SpringClientDemoService implements SpringClientDemoInterface{
-    //private final WebClient webClient;
-    //private final LogRecordService logService;
-
     // Constructor-based dependency injection for WebClient
     @Autowired
     public SpringClientDemoService(WebClient webClient) {
-    //    this.logService = new LogRecordService();
-        //this.webClient = webClient;
-    //    System.out.println("init SpringClientDemoService()");
-    //    this.webClient = new WebConfig().getWebClient();
   }
 
 

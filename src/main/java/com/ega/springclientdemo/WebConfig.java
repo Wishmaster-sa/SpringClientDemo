@@ -5,49 +5,18 @@
 package com.ega.springclientdemo;
 
 import com.ega.springclientdemo.models.AppSettings;
-import io.github.edwardUL99.inject.lite.annotations.PreConstruct;
 import java.util.HashMap;
-import org.mockito.Mockito;
-import org.springframework.beans.factory.InitializingBean;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.PropertySource;
-import org.springframework.core.env.Environment;
 import org.springframework.http.MediaType;
-import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 
 /**
  *
- * @author parallels
+ * @author sa
  */
 @Configuration
-//@PropertySource("classpath:application.properties")
-//public class WebConfig implements InitializingBean{
 public class WebConfig {
-    //private final AppSettings appSettings;
-    //@Value("${webclient.settings.serverpath:http:\/\/localhost:8080\/api\/v1\/persons\/}")
-    //@Value("${property.name}")
-    //private static final String PROPERTY_NAME;
-    //@Value("${webclient.settings.logfilename}")
-    //private String PROPERTY_NAME;
-
-    //@Value("${webclient.settings.serverpath}")
-    //private String serverpath;
-    
-    //private static String SERVER_PATH;
-    
-    //@Autowired
-    //private static Environment env;
-    
-
-    public WebConfig(){
-    //    appSettings = new AppSettings();
-    //    this.serverpath = AppSettings.SERVER_PATH;
-    }
-    
     
     @Bean
     public WebClient getWebClient() {
@@ -75,13 +44,4 @@ public class WebConfig {
     //webClient.defaultHeader()
     return webClient; // Return the configured WebClient bean
   }
-/*
-    @Override
-    public void afterPropertiesSet()  {
-        System.out.println("PostConstruct: ExampleBean is initialized = "+SERVER_PATH);
-        System.out.println("PostConstruct: ExampleBean is initialized = "+serverpath);
-        WebConfig.SERVER_PATH = serverpath;
-    
-    }
-*/
 }
