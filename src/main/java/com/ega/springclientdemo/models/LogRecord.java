@@ -18,7 +18,9 @@ import org.json.JSONObject;
 @Data
 public class LogRecord {
     private LocalDateTime dateTime;
-    private String ip;
+    private String type;
+    private String quieryId;
+    private String uri;
     private String httpMethod;
     private String resource;
     private String body;
@@ -30,7 +32,9 @@ public class LogRecord {
     //Конструктор класу за замовчуванням
     public LogRecord(){
         this.dateTime = LocalDateTime.now();
-        this.ip = "localhost";
+        this.type = "";
+        this.quieryId = "";
+        this.uri = AppSettings.SERVER_PATH;
         this.httpMethod = "";
         this.resource = "";
         this.body = "";
@@ -44,7 +48,9 @@ public class LogRecord {
     public JSONObject toJSON(){
         JSONObject jsData = new JSONObject();
         jsData.put("dateTime",getDateTime());
-        jsData.put("ip",getIp());
+        jsData.put("type",getType());
+        jsData.put("queryId",getQuieryId());
+        jsData.put("uri",getUri());
         jsData.put("httpMethod",getHttpMethod());
         jsData.put("headers", headers);
         jsData.put("resource",getResource());

@@ -95,6 +95,13 @@
     let collection = itemList.selectedOptions;
     let searchKeyLabel = collection[0].label;
     
+    if(searchValue===""){
+        messageBox.textContent = `Треба заповнити поле пошуку!`;  // Повідомлення про помилку
+        messageBox.className = 'alert alert-danger';
+        messageBox.style.display = 'block';        
+        return;
+    }
+    
     console.log("Your choice is: "+searchKeyLabel);
     console.log("Search for: "+searchValue);
 

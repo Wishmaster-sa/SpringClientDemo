@@ -7,22 +7,33 @@ package com.ega.springclientdemo.controllers;
 import com.ega.springclientdemo.WebConfig;
 import com.ega.springclientdemo.interfaces.SpringClientDemoInterface;
 import com.ega.springclientdemo.models.Answer;
+import com.ega.springclientdemo.models.AppSettings;
 import com.ega.springclientdemo.models.Persona;
 import com.ega.springclientdemo.services.SpringClientDemoService;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.io.BufferedInputStream;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import java.util.Scanner;
 import org.json.JSONObject;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
 
@@ -53,9 +64,11 @@ public class SpringClientDemoController {
 
         @GetMapping("/certs")
         //перехід до сторинкі створення персони
-	public String viewCerts() throws FileNotFoundException{
+	public Mono<String> listCerts() throws FileNotFoundException{
             System.out.println("Certs page!");
-            return render_template("list_certs.html");
+            
+            return service.listCerts();
+            //return render_template("list_certs.html");
 	}
 
         @GetMapping("/files")
@@ -88,27 +101,36 @@ public class SpringClientDemoController {
             String searchKey = js.getString("searchKey");
             String searchValue = js.getString("searchValue");
             Mono<String> res = null;
-            
-            //String method = HttpRequestUtils.getHttpMethod();
-            //System.out.println("method: " + method);
-            
+        /*    
             switch(searchKey){
                 case "rnokpp" -> res = service.findPersona(searchValue);    
                 case "firstName" -> res = service.findByFirstName(searchValue);    
                 case "lastName" -> res = service.findByLastName(searchValue);    
+                case "birthDate" -> res = service.findByBirthDate(searchValue);    
                 case "pasport" -> res = service.findByPasport(searchValue);    
                 case "unzr" -> res = service.findByUnzr(searchValue);    
             }
-            
-            
+        */    
+            switch(searchKey){
+                case "rnokpp" -> res = service.getHtml("/find/"+searchValue);    
+                case "firstName" -> res = service.getHtml("/find/firstname/"+searchValue);    
+                case "lastName" -> res = service.getHtml("/find/lastname/"+searchValue);    
+                case "birthDate" -> res = service.getHtml("/find/birthDate/"+searchValue);    
+                case "pasport" -> res = service.getHtml("/find/pasport/"+searchValue);    
+                case "unzr" -> res = service.getHtml("/find/unzr/"+searchValue);    
+            }
+        
             return res;
 	}
         
         @GetMapping("/list")
         //перехід до сторинкі відображення списка персон
-	public Mono<String> listPersona() throws FileNotFoundException{
+	public Mono<Answer> listPersona() throws FileNotFoundException{
             System.out.println("List persona page!");
-            return service.listPersons();
+            
+            //return service.listPersons();
+            //return service.getHtml("/list");
+            return service.showAll();
 	}
         
         @PatchMapping("/update")
@@ -141,7 +163,31 @@ public class SpringClientDemoController {
 				.header("HX-Trigger", mapper.writeValueAsString(Map.of("notice", "Notification"))).build();
 	}
         
-    
+        
+        //завантаження сертіфікатів
+        @GetMapping("/download_cert/{filename}")
+	public ResponseEntity<InputStreamResource> downloadCert(@PathVariable String filename) throws IOException{
+            String path = "";
+            if(AppSettings.CERTS_PATH.startsWith(".")){
+                path = new File(".").getCanonicalPath()+"/"+AppSettings.CERTS_PATH.substring(2)+"/"+filename;
+            }else{
+                path = new File(".").getCanonicalPath()+"/"+AppSettings.CERTS_PATH+"/"+filename;
+            }
+            System.out.println("Download file: "+path);
+            File ff = new File(path);
+            
+            InputStream bin1 = new FileInputStream(path);
+            long len = ff.length();
+
+            return ResponseEntity
+                .ok()
+                .contentLength(len)
+                .contentType(
+                        MediaType.parseMediaType("application/octet-stream"))
+                .body(new InputStreamResource(bin1));
+
+        }
+
     public String render_template(String templateName)
         throws FileNotFoundException
     {

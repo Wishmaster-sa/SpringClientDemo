@@ -4,6 +4,7 @@
  */
 package com.ega.springclientdemo.models;
 
+import java.util.Map;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -17,7 +18,7 @@ import org.springframework.stereotype.Component;
 
 public class AppSettings implements InitializingBean{
     
-    @Value("${webclient.settings.serverpath}")
+    @Value("${webclient.settings.server-path}")
     private String serverpath;
     
     @Value("${webclient.settings.logfilename}")
@@ -26,47 +27,59 @@ public class AppSettings implements InitializingBean{
     @Value("${webclient.settings.loglevel}")
     private String loglevel;
     
-    @Value("${webclient.test}")
-    private String test;
+    @Value("${webclient.settings.certs-path}")
+    private String certspath;
 
+    @Value("${webclient.settings.asic-store}")
+    private String asicpath;
+
+    @Value("${webclient.settings.ssl}")
+    private boolean usessl;
+
+    @Value("${webclient.settings.trust-store-path}")
+    private String truststore;
+
+    @Value("${webclient.settings.trust-store-password}")
+    private String truststore_pass;
+
+    //valuesMap={key1: '1', key2: '2', key3: '3'}
+    //@Value("#{${valuesMap}}")
+    //private Map<String, Integer> valuesMap;
+
+    @Value("#{${webclient.settings.headers:{key:'1'}}}")
+    private Map<String,String> headers;
+    
     public static String SERVER_PATH;
     
     public static String LOG_FILENAME;
     
     public static String LOG_LEVEL;
 
-    public static String TEST;
-/*    
-    @Value("${webclient.settings.serverpath}")
-    public void setServerPath(String path){
-        this.SERVER_PATH = path;
-    }
+    public static String CERTS_PATH;
 
-    @Value("${webclient.settings.logfilename}")
-    public void setLogFilePath(String file){
-        this.LOG_FILENAME = file;
-    }
+    public static String ASIC_PATH;
+
+    public static boolean USE_SSL;
     
-    public String getServerPath(){
-        return SERVER_PATH;
-    }
+    public static String TRUSTSTORE_PATH;
 
-    public String getLogName(){
-        return LOG_FILENAME;
-    }
-    public String getLogLevel(){
-        return LOG_LEVEL;
-    }
-    public String getTest(){
-        return TEST;
-    }
-*/
+    public static String TRUSTSTORE_PASSWORD;
+
+    public static Map<String,String> HEADERS;
+    
+
     @Override
     public void afterPropertiesSet() {
         AppSettings.SERVER_PATH = serverpath;
         AppSettings.LOG_FILENAME = logfile;
         AppSettings.LOG_LEVEL = loglevel;
-        AppSettings.TEST = test;
+        AppSettings.CERTS_PATH = certspath;
+        AppSettings.USE_SSL = usessl;
+        AppSettings.TRUSTSTORE_PATH = truststore;
+        AppSettings.TRUSTSTORE_PASSWORD = truststore_pass;
+        AppSettings.ASIC_PATH = asicpath;
+        AppSettings.HEADERS = headers;
+        
         System.out.println("afterPropertiesSet: ExampleBean is initialized = "+SERVER_PATH);
 
     }
