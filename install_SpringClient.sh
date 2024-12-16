@@ -68,6 +68,8 @@ sudo apt install git -y
 echo "******************************************************************************
 *                  Клонування Spring Web-Client із Github
 ******************************************************************************"
+currentuser=$(stat -c "%G" .)
+
 if [ -e ./SpringClientDemo ]; then
 	echo "проєкт SpringWClient вже існує, клонування пропущено"
 else 
