@@ -88,7 +88,7 @@ cd ./SpringClientDemo
 
 /usr/lib/apache-netbeans/java/maven/bin/mvn package
 
-sudo chown +x ./start-client.sh
+sudo chmod +x ./start-client.sh
 
 
 echo "******************************************************************************
