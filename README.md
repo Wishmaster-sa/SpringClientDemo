@@ -99,18 +99,35 @@ sudo apt install git
 та встановити коректні параметри підключення до сервіса 
 
 ```
-server.ssl.key-store-type=PKCS12
-server.ssl.key-store=/home/sa/NetBeansProjects/SpringClientDemo/keystore/keystore.p12
-server.ssl.key-store-password=localhost
-server.ssl.trust-store=/home/sa/NetBeansProjects/SpringClientDemo/keystore/truststore.p12
-server.ssl.trust-store-password=mypass
-server.ssl.trust-store-type=PKCS12
-server.ssl.key-alias=ss93
-server.port=8050
-server.ssl.enabled=true
-server.ssl.client-auth=NONE
-webclient.basepath=https://192.168.99.126:8080/api/v1/persons
+server.port=5001
+webclient.settings.logfilename=client.log
+webclient.settings.loglevel=2
+webclient.settings.server-path=https://192.168.99.93/restapi
+webclient.settings.ssl=false
+webclient.settings.certs-path=./certs
+webclient.settings.asic-store=asic
+webclient.settings.trust-store-path=keystore/keystore.p12
+webclient.settings.trust-store-password=localhost
+webclient.settings.headers={'UXP-CLIENT': 'test1/GOV/00000088/TEST_SUB888', 'UXP-SERVICE': 'test1/GOV/00000088/TEST_SUB888/springrest'}
 ```
+    * Вам треба вказати адрес сервіса (server-path)
+    * порт клієнта (port)
+    * Встановити або змінити файл логування (logfilename)
+    * Встановити або змінити рівень логування. (0 - немає логування, 2 - є повне логування) 
+    * У разі якщо ви бажаєте використовувати SSL то треба встановити:
+    * Потреба використовувати SSL (ssl=true)
+    * Шлях до файлів сертіфікатів (certs-path)
+    * Шлях до сховища довіри (trust-store-path та trust-store-password)
+    * Шлях до збереження ASIC контейнерів (asic-store)
+    * Також у разі використовування сервіса разом Трембітою треба налаштувати хедери (headers)
+    * 
+    * Зберегите файл налаштувань та виконайте наступну команду:  bash start-client.sh
+    * Кліент буде доступний за адресою http[s]://localhost:[port]
+    * також у вас повинен бути вже розгорнутий та налаштований SpringWSrest сервіс до якого цей
+    * клієнт буде звертатись.
+
+
+
 
 #### Переходимо до каталогу з проєктом
 
@@ -123,16 +140,14 @@ webclient.basepath=https://192.168.99.126:8080/api/v1/persons
 mvn package
 ```
 
-### Запуск сервісу (ви повинні знаходитись в каталозі з сервісом SpringClientDemo)
+### Запуск клієнта (ви повинні знаходитись в каталозі з сервісом SpringClientDemo)
 
 ```bash
-java -jar ./target/SpringClientDemo-0.0.1-SNAPSHOT.jar
+bash start-client.sh
 ```
 
 Сервіс запуститься і буде очікувати на вхідні мережеві з'єднання на порту 8050 за адресою
 http://localhost:8050/
-
-Тут `SpringClientDemo-0.0.1-SNAPSHOT.jar` - це ім'я скомпільованого файлу проєкту. Відкрийте браузер і перейдіть за адресою http://[адреса серверу]:8050.
 
 
 ## Документація
