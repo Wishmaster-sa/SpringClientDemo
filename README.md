@@ -156,7 +156,7 @@ webclient.settings.headers={'UXP-CLIENT': 'test1/GOV/00000088/TEST_SUB888', 'UXP
 
 ### Компілюємо вихідний файл
 ```bash
-mvn package
+/usr/lib/apache-netbeans/java/maven/bin/mvn package
 ```
 
 ### Запуск клієнта (ви повинні знаходитись в каталозі з сервісом SpringClientDemo)
