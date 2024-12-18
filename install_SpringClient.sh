@@ -73,7 +73,7 @@ currentuser=$(stat -c "%G" .)
 if [ -e ./SpringClientDemo ]; then
 	echo "проєкт SpringWClient вже існує, клонування пропущено"
 else 
-	git clone https://github.com/Wishmaster-sa/SpringClentDemo.git
+	git clone https://github.com/Wishmaster-sa/SpringClientDemo.git
 
 	sudo chown -R $currentuser:$currentuser ./SpringClientDemo
 fi
