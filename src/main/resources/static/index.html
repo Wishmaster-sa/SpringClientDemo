@@ -46,34 +46,44 @@
     </div>
 </nav>
 
-<div class="container mt-5">
-    <!-- Заголовок сторінки -->
+    
+<div class="container">
     <h2>Пошук у БД</h2>
-    <!-- Форма для пошуку в базі даних -->
-    <form class="container">
-        <!-- Група елементів форми для вибору поля пошуку -->
+    <form action="/find">
         <div class="form-group">
             <label for="search-field">Оберіть поле для пошуку</label>
             <!-- Випадаючий список для вибору поля пошуку -->
             <select class="form-control" id="search-field" name="search_field" required>
-                <option value="name">Імʼя</option>
-                <option value="surname">Прізвище</option>
-                <option value="dateOfBirth">Дата народження</option>
-                <option value="passportNumber">Номер паспорту</option>
+                <option value="firstName">Імʼя</option>
+                <option value="lastName">Прізвище</option>
+                <option value="birthDate">Дата народження</option>
+                <option value="passport">Номер паспорту</option>
                 <option value="unzr">УНЗР</option>
                 <option value="rnokpp">РНОКПП</option>
             </select>
         </div>
-        <!-- Група елементів форми для введення значення пошуку -->
         <div class="form-group">
             <label for="search-value">Значення для пошуку</label>
             <!-- Текстове поле для введення значення пошуку -->
-            <input type="text" class="form-control" id="search-value" name="search_value" required>
+            <input type="text" class="form-control" id="search-value" name="search_value" required >
         </div>
-        <!-- Кнопка для відправки форми -->
-        <button type="button" class="btn btn-primary" id="searchButton" onclick="searchPersons()">Пошук</button>  
+        <button type="submit" class="btn btn-primary">Пошук</button>
     </form>
+</div>
+    
+    <script>
+        
+    function checkForEnter(e) {
+      if (e.keyCode === 13) { 
+        <!-- searchPersons();-->
+        <!-- document.getElementById('searchButton').cli-->
+        document.querySelector(".block .button").click();
+      }
+    }
 
+    </script>
+
+    
     <!-- Блок для повідомлень -->
     <div id="messageBox" class="alert" role="alert" style="display: none;"></div>
     
@@ -87,9 +97,10 @@
 
 <script>
     function searchPersons() {
+    console.log("I can search");
 
     let itemList = document.getElementById("search-field");
-    const searchValue = document.getElementById('search-value').value;
+    const searchValue = document.getElementById('txt').value;
     const messageBox = document.getElementById('messageBox');
 
     let collection = itemList.selectedOptions;

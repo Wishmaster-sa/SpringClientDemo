@@ -83,6 +83,5 @@ public class AppSettings implements InitializingBean{
         System.out.println("afterPropertiesSet: ExampleBean is initialized = "+SERVER_PATH);
 
     }
-
     
 }

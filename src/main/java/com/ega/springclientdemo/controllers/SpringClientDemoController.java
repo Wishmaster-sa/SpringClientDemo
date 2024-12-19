@@ -34,6 +34,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
 
@@ -122,15 +123,36 @@ public class SpringClientDemoController {
         
             return res;
 	}
+
+        @GetMapping("/find")
+        //перехід до сторинкі відображення персони
+	public Mono<String> findPersonForm( @RequestParam(value="search_field",required=true)String searchKey, @RequestParam(value="search_value",required=true)String searchValue){
+            System.out.println("Search persons...");
+            System.out.println("key: " + searchKey);
+            System.out.println("value: " + searchValue);
+            
+            Mono<String> res = null;
+            
+            switch(searchKey){
+                case "rnokpp" -> res = service.getHtml("/find/"+searchValue);    
+                case "firstName" -> res = service.getHtml("/find/firstname/"+searchValue);    
+                case "lastName" -> res = service.getHtml("/find/lastname/"+searchValue);    
+                case "birthDate" -> res = service.getHtml("/find/birthDate/"+searchValue);    
+                case "pasport" -> res = service.getHtml("/find/pasport/"+searchValue);    
+                case "unzr" -> res = service.getHtml("/find/unzr/"+searchValue);    
+            }
+        
+            return res;
+	}
         
         @GetMapping("/list")
         //перехід до сторинкі відображення списка персон
-	public Mono<Answer> listPersona() throws FileNotFoundException{
+	public Mono<String> listPersona() throws FileNotFoundException{
             System.out.println("List persona page!");
             
             //return service.listPersons();
-            //return service.getHtml("/list");
-            return service.showAll();
+            return service.getHtml("/list");
+            //return service.showAll();
 	}
         
         @PatchMapping("/update")
