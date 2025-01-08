@@ -118,7 +118,7 @@ sudo apt install git
 та встановити коректні параметри підключення до сервіса 
 
 ```
-server.port=5001
+server.port=8050
 webclient.settings.logfilename=client.log
 webclient.settings.loglevel=2
 webclient.settings.server-path=https://192.168.99.93/restapi
@@ -156,7 +156,7 @@ webclient.settings.headers={'UXP-CLIENT': 'test1/GOV/00000088/TEST_SUB888', 'UXP
 
 ### Компілюємо вихідний файл
 ```bash
-/usr/lib/apache-netbeans/java/maven/bin/mvn package
+/usr/bin/mvn package
 ```
 
 ### Запуск клієнта (ви повинні знаходитись в каталозі з сервісом SpringClientDemo)
