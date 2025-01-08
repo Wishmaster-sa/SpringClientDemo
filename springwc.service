@@ -11,7 +11,7 @@ WorkingDirectory=/opt/SpringWClient
 
 #path to executable. 
 #executable is a bash script which calls jar file
-ExecStart=java -jar /opt/SpringWClient/SpringClientDemo-0.0.1-SNAPSHOT.jar
+ExecStart=java -jar /opt/SpringWClient/SpringClientDemo-1.0-SNAPSHOT.jar
 
 SuccessExitStatus=143
 TimeoutStopSec=10
