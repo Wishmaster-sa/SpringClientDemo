@@ -9,7 +9,7 @@ function installService() {
 	sed -i "s/User=sa/User=$currentuser/g" $autostartFile
 	sudo mkdir /opt/SpringWClient
 	sudo mkdir /opt/SpringWClient/config
-	sudo cp ./target/SpringClientDemo-0.0.1-SNAPSHOT.jar /opt/SpringWClient
+	sudo cp ./target/SpringClientDemo-1.0-SNAPSHOT.jar /opt/SpringWClient
         sudo cp -R config/* /opt/SpringWClient/config 
 	#sudo cp ./webservice.settings /opt/SpringWClient
 	sudo cp ./springwc.service /etc/systemd/system
