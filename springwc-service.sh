@@ -9,8 +9,10 @@ function installService() {
 	sed -i "s/User=sa/User=$currentuser/g" $autostartFile
 	sudo mkdir /opt/SpringWClient
 	sudo mkdir /opt/SpringWClient/config
+	sudo mkdir /opt/SpringWClient/certs
 	sudo cp ./target/SpringClientDemo-1.0-SNAPSHOT.jar /opt/SpringWClient
         sudo cp -R config/* /opt/SpringWClient/config 
+        sudo cp -R certs/* /opt/SpringWClient/certs 
 	#sudo cp ./webservice.settings /opt/SpringWClient
 	sudo cp ./springwc.service /etc/systemd/system
 	sudo systemctl daemon-reload
