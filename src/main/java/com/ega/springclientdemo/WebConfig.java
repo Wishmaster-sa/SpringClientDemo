@@ -7,7 +7,6 @@ package com.ega.springclientdemo;
 import com.ega.springclientdemo.models.AppSettings;
 import io.netty.handler.ssl.SslContext;
 import io.netty.handler.ssl.SslContextBuilder;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;

@@ -11,7 +11,6 @@ import com.ega.springclientdemo.models.AppSettings;
 import com.ega.springclientdemo.models.Persona;
 import com.ega.springclientdemo.services.SpringClientDemoService;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -21,7 +20,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import java.util.Scanner;
 import org.json.JSONObject;
-import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -32,8 +30,6 @@ import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
@@ -102,16 +98,7 @@ public class SpringClientDemoController {
             String searchKey = js.getString("searchKey");
             String searchValue = js.getString("searchValue");
             Mono<String> res = null;
-        /*    
-            switch(searchKey){
-                case "rnokpp" -> res = service.findPersona(searchValue);    
-                case "firstName" -> res = service.findByFirstName(searchValue);    
-                case "lastName" -> res = service.findByLastName(searchValue);    
-                case "birthDate" -> res = service.findByBirthDate(searchValue);    
-                case "pasport" -> res = service.findByPasport(searchValue);    
-                case "unzr" -> res = service.findByUnzr(searchValue);    
-            }
-        */    
+
             switch(searchKey){
                 case "rnokpp" -> res = service.getHtml("/find/"+searchValue);    
                 case "firstName" -> res = service.getHtml("/find/firstname/"+searchValue);    

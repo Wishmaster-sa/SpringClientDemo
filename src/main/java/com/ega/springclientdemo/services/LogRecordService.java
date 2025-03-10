@@ -24,15 +24,6 @@ import org.springframework.stereotype.Component;
 public class LogRecordService implements LogRecordInterface{
     //ініціалізація файлу налаштувань
     
-    //@Value("${webclient.settings.logfilename:client.log}")
-    //повний шлях до файлу лога
-    //private String logFileName;
-
-    //@Value("${webclient.settings.loglevel:0}") 
-    //рівень логування.
-    //private int logLevel;
-
-    
     
     @Override
     public Boolean addRecord(LogRecord record) {

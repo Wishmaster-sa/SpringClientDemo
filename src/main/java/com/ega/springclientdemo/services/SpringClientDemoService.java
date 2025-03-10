@@ -93,50 +93,9 @@ public class SpringClientDemoService implements SpringClientDemoInterface{
                 ;
     }
     
-    /*
-    // Method to retrieve an employee using a GET request
-    @Override
-    public Mono<String> findPersona(String rnokpp) {
-        String tmp;
-        WebClient webClient = new WebConfig().getWebClient();
-        String queryId = UUID.randomUUID().toString();
-        String resource = "/find/"+rnokpp+"?"+queryId;
-        HashMap log = new HashMap();
-        
-        log.put("type", "REQUEST");
-        log.put("httpMethod", "GET");
-        log.put("uri", AppSettings.SERVER_PATH);
-        log.put("resource", resource);
-        log.put("queryId", queryId);
-                
-        try {
-            tmp = render_template("list_person.html");
-        } catch (FileNotFoundException ex) {
-            tmp = "ERROR: "+ex.getMessage();
-        }
-
-        final String html = tmp;
-        return webClient.get()
-                .uri("/find/"+rnokpp)
-                .retrieve()
-                .onStatus(HttpStatusCode::is5xxServerError, clientResponse ->
-                    clientResponse.bodyToMono(String.class)
-                        .flatMap(body -> Mono.error(new RuntimeException("Server Error: " + body))))
-                .bodyToMono(Answer.class)                       //перетворюємо на Answer
-                .map(value-> transformToTable(value, html))     //модіфікуємо сторінку list_person.html
-                .flatMap(response-> Mono.just(response))                //перетворюємо відповідь в Моно String. flatMap тому що на виході об'ект Моно.
-                ;
-    }
-    */
     
     private void getASIC(String queryId){
         Path path = Paths.get("src/main/resources/sample.zip");
-/*
-        WebClient client = WebClient.builder()
-            .baseUrl("https://www.learningcontainer.com/wp-content/uploads/2020/05/sample-zip-file.zip")
-            .build();
-        Flux<DataBuffer> dataBufferFlux = client.get().retrieve().bodyToFlux(DataBuffer.class);
-*/
 
         WebClient webClient = new WebConfig().getWebClient();
         String tmp;
@@ -243,33 +202,6 @@ public class SpringClientDemoService implements SpringClientDemoInterface{
         return html;
     }
     
-    /*
-    @Override
-    public Mono<String> listPersons() {
-        String tmp;
-        WebClient webClient = new WebConfig().getWebClient();
-
-        try {
-            tmp = render_template("list_person.html");
-        } catch (FileNotFoundException ex) {
-            Logger.getLogger(SpringClientDemoService.class.getName()).log(Level.SEVERE, null, ex);
-            tmp = "ERROR: "+ex.getMessage();
-        }
-
-        final String html = tmp;
-        return webClient.get()
-                .uri("/list")
-                .retrieve()
-                .onStatus(HttpStatusCode::is5xxServerError, clientResponse ->
-                    clientResponse.bodyToMono(String.class)
-                        .flatMap(body -> Mono.error(new RuntimeException("Server Error: " + body))))
-                .bodyToMono(Answer.class)                       //перетворюємо на Answer
-                .map(value->transformToTable(value, html))             //отримаемо результат запита (String)
-                .flatMap(response-> Mono.just(response))               //перетворюємо відповідь в Моно String. flatMap тому що на виході об'ект Моно.
-                ;
-    }
-*/
- //   @Override
     public Mono<Answer> showAll() {
         WebClient webClient = new WebConfig().getWebClient();
 
@@ -337,109 +269,6 @@ public class SpringClientDemoService implements SpringClientDemoInterface{
         
         throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
-/*
-    @Override
-    public Mono<String> findByFirstName(String searchData) {
-        String tmp;
-        String param = "?queryId="+UUID.randomUUID().toString();
-        WebClient webClient2 = new WebConfig().getWebClient();
-        
-        try {
-            tmp = render_template("list_person.html");
-        } catch (FileNotFoundException ex) {
-            Logger.getLogger(SpringClientDemoService.class.getName()).log(Level.SEVERE, null, ex);
-            tmp = "ERROR: "+ex.getMessage();
-        }
-
-        final String html = tmp;
-        return webClient2.get()
-                .uri("/find/firstname/"+searchData+param)
-                .header("Content-Type", "application/json")
-                .retrieve()
-                .onStatus(HttpStatusCode::is5xxServerError, clientResponse ->
-                    clientResponse.bodyToMono(String.class)
-                        .flatMap(body -> Mono.error(new RuntimeException("Server Error: " + body))))
-                .bodyToMono(Answer.class)                       //перетворюємо на Answer
-                .map(value->transformToTable(value, html))                             //отримаемо результат запита (String)
-                //.map((String data)-> transformToTable2(data, html))     //модіфікуємо сторінку list_person.html
-                .flatMap(response-> Mono.just(response))                //перетворюємо відповідь в Моно String. flatMap тому що на виході об'ект Моно.
-                ;
-    }
-
-    @Override
-    public Mono<String> findByLastName(String searchData) {
-        String tmp;
-        WebClient webClient2 = new WebConfig().getWebClient();
-        try {
-            tmp = render_template("list_person.html");
-        } catch (FileNotFoundException ex) {
-            Logger.getLogger(SpringClientDemoService.class.getName()).log(Level.SEVERE, null, ex);
-            tmp = "ERROR: "+ex.getMessage();
-        }
-
-        final String html = tmp;
-        return webClient2.get()
-                .uri("find/lastname/"+searchData)
-                .retrieve()
-                .onStatus(HttpStatusCode::is5xxServerError, clientResponse ->
-                    clientResponse.bodyToMono(String.class)
-                        .flatMap(body -> Mono.error(new RuntimeException("Server Error: " + body))))
-                .bodyToMono(Answer.class)                       //перетворюємо на Answer
-                .map(value->transformToTable(value, html))                             //отримаемо результат запита (String)
-                .flatMap(response-> Mono.just(response))                //перетворюємо відповідь в Моно String. flatMap тому що на виході об'ект Моно.
-                ;
-    }
-
-    @Override
-    public Mono<String> findByPasport(String searchData) {
-        WebClient webClient = new WebConfig().getWebClient();
-
-        String tmp;
-        try {
-            tmp = render_template("list_person.html");
-        } catch (FileNotFoundException ex) {
-            Logger.getLogger(SpringClientDemoService.class.getName()).log(Level.SEVERE, null, ex);
-            tmp = "ERROR: "+ex.getMessage();
-        }
-
-        final String html = tmp;
-        return webClient.get()
-                .uri("pasport/"+searchData)
-                .retrieve()
-                .onStatus(HttpStatusCode::is5xxServerError, clientResponse ->
-                    clientResponse.bodyToMono(String.class)
-                        .flatMap(body -> Mono.error(new RuntimeException("Server Error: " + body))))
-                .bodyToMono(Answer.class)                       //перетворюємо на Answer
-                .map(value->transformToTable(value, html))                             //отримаемо результат запита (String)
-                .flatMap(response-> Mono.just(response))                //перетворюємо відповідь в Моно String. flatMap тому що на виході об'ект Моно.
-                ;
-    }
-
-    @Override
-    public Mono<String> findByUnzr(String searchData) {
-        WebClient webClient = new WebConfig().getWebClient();
-        String tmp;
-
-        try {
-            tmp = render_template("list_person.html");
-        } catch (FileNotFoundException ex) {
-            Logger.getLogger(SpringClientDemoService.class.getName()).log(Level.SEVERE, null, ex);
-            tmp = "ERROR: "+ex.getMessage();
-        }
-
-        final String html = tmp;
-        return webClient.get()
-                .uri("unzr/"+searchData)
-                .retrieve()
-                .onStatus(HttpStatusCode::is5xxServerError, clientResponse ->
-                    clientResponse.bodyToMono(String.class)
-                        .flatMap(body -> Mono.error(new RuntimeException("Server Error: " + body))))
-                .bodyToMono(Answer.class)                       //перетворюємо на Answer
-                .map(value->transformToTable(value, html))                             //отримаемо результат запита (String)
-                .flatMap(response-> Mono.just(response))                //перетворюємо відповідь в Моно String. flatMap тому що на виході об'ект Моно.
-                ;
-    }
-*/
     
         //запис лога
     private void writeLog(HashMap logrecord){
@@ -456,44 +285,10 @@ public class SpringClientDemoService implements SpringClientDemoInterface{
         //log.setHeaders((String)logrecord.getOrDefault("headers"));
 
         log.setBody((String)logrecord.getOrDefault("body",""));
-        /*
-        if(ans!=null){
-            log.setError(!ans.getStatus());
-            log.setResult(ans);
-            log.setDescr(ans.getDescr());
-            log.setBody("");
-        }
-        */
         
         logService.addRecord(log);
         
     }
-/*
-    @Override
-    public Mono<String> findByBirthDate(String searchValue) {
-        WebClient webClient = new WebConfig().getWebClient();
-        String tmp;
-
-        try {
-            tmp = render_template("list_person.html");
-        } catch (FileNotFoundException ex) {
-            Logger.getLogger(SpringClientDemoService.class.getName()).log(Level.SEVERE, null, ex);
-            tmp = "ERROR: "+ex.getMessage();
-        }
-
-        final String html = tmp;
-        return webClient.get()
-                .uri("birthDate/"+searchValue)
-                .retrieve()
-                .onStatus(HttpStatusCode::is5xxServerError, clientResponse ->
-                    clientResponse.bodyToMono(String.class)
-                        .flatMap(body -> Mono.error(new RuntimeException("Server Error: " + body))))
-                .bodyToMono(Answer.class)                       //перетворюємо на Answer
-                .map(value->transformToTable(value, html))                             //отримаемо результат запита (String)
-                .flatMap(response-> Mono.just(response))                //перетворюємо відповідь в Моно String. flatMap тому що на виході об'ект Моно.
-                ;
-    }
-*/
 
     @Override
     public Mono<String> listCerts() {
@@ -549,17 +344,6 @@ public class SpringClientDemoService implements SpringClientDemoInterface{
     
         return Mono.just("");
     }
-/*
-    @GET
-    @Produces(MediaType.APPLICATION_OCTET_STREAM)
-    public Response getFile(String path) {
-      File file = new File(path);
-      
-      return Response.ok(file, MediaType.APPLICATION_OCTET_STREAM)
-          .header("Content-Disposition", "attachment; filename=\"" + file.getName() + "\"" ) //optional
-          .build();
-    }        
-  */  
 
 }
 

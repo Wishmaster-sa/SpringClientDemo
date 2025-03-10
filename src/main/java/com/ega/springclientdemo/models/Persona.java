@@ -36,6 +36,7 @@ public class Persona implements Serializable{
     private String firstName;
     private String lastName;
     private String patronymic;
+    private String gender;
     private LocalDate birthDate;
     private String pasport;
     //Говорить, що наступне поле потрібно зробити унікальним в БД
@@ -56,6 +57,7 @@ public class Persona implements Serializable{
         this.firstName = "";
         this.lastName = "";
         this.patronymic = "";
+        this.gender = "";
         this.birthDate = LocalDate.of(1, 1, 1);
         this.pasport = "";
         this.unzr = "";
@@ -79,6 +81,7 @@ public class Persona implements Serializable{
         jsData.put("firstName",getFirstName());
         jsData.put("lastName",getLastName());
         jsData.put("patronymic",getPatronymic());
+        jsData.put("gender",getGender());
         jsData.put("unzr",getUnzr());
         jsData.put("rnokpp",getRnokpp());
         jsData.put("pasport",getPasport());
@@ -106,6 +109,7 @@ public class Persona implements Serializable{
         result += "\"lastName\":\""+getLastName()+"\",\n";
         result += "\"firstName\":\""+getFirstName()+"\",\n";
         result += "\"patronymic\":\""+getPatronymic()+"\",\n";
+        result += "\"gender\":\""+getGender()+"\",\n";
         result += "\"unzr\":\""+getUnzr()+"\",\n";
         result += "\"rnokpp\":\""+getRnokpp()+"\",\n";
         result += "\"pasport\":\""+getPasport()+"\",\n";
