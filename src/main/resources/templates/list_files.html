@@ -53,15 +53,7 @@
             </tr>
         </thead>
         <tbody>
-            {% for file in files %}  <!-- Цикл для проходження по всіх файлах -->
-            <tr>
-                <td>{{ file.name }}</td>  <!-- Відображаємо ім'я файлу -->
-                <td>{{ file.creation_time }}</td>  <!-- Відображаємо дату і час створення файлу -->
-                <td>
-                    <a href="{{ url_for('download_file', filename=file.name) }}" class="btn btn-primary">Скачати</a>  <!-- Посилання для завантаження файлу -->
-                </td>
-            </tr>
-            {% endfor %}
+            <!--@DataTable -->
         </tbody>
     </table>
     <button class="btn btn-primary" onclick="history.back()">Назад</button>  <!-- Кнопка для повернення на попередню сторінку -->

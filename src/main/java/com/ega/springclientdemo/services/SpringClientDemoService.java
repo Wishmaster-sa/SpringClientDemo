@@ -10,8 +10,13 @@ import com.ega.springclientdemo.models.Answer;
 import com.ega.springclientdemo.models.AppSettings;
 import com.ega.springclientdemo.models.LogRecord;
 import com.ega.springclientdemo.models.Persona;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
@@ -20,6 +25,7 @@ import java.nio.file.StandardOpenOption;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Scanner;
@@ -71,15 +77,13 @@ public class SpringClientDemoService implements SpringClientDemoInterface{
         log.put("queryId", queryId);
         
         writeLog(log);
+        loguuid(queryId);
         
         String param = resource+"?queryId="+queryId;
-                
-        try {
-            tmp = render_template("list_person.html");
-        } catch (FileNotFoundException ex) {
-            tmp = "ERROR: "+ex.getMessage();
-        }
+        
+        tmp = render_template("list_person.html");
 
+        
         final String html = tmp;
         return webClient.get()
                 .uri(param)
@@ -91,20 +95,6 @@ public class SpringClientDemoService implements SpringClientDemoInterface{
                 .map(value-> transformToTable(value, html,queryId))     //модіфікуємо сторінку list_person.html
                 .flatMap(response-> Mono.just(response))                //перетворюємо відповідь в Моно String. flatMap тому що на виході об'ект Моно.
                 ;
-    }
-    
-    
-    private void getASIC(String queryId){
-        Path path = Paths.get("src/main/resources/sample.zip");
-
-        WebClient webClient = new WebConfig().getWebClient();
-        String tmp;
-
-        Flux<DataBuffer> dataBufferFlux = webClient.get()
-                .uri("signature?&queryId="+queryId+"&xRoadInstance=test1&memberClass=GOV&memberCode=00000088&subsystemCode=TEST_SUB888")
-                .retrieve().bodyToFlux(DataBuffer.class);
-        DataBufferUtils.write(dataBufferFlux, path, StandardOpenOption.CREATE).block(); //Creates new file or overwrites exisiting file
-        
     }
     
     public String transformToTable(Answer ans, String html,String queryId){
@@ -187,20 +177,24 @@ public class SpringClientDemoService implements SpringClientDemoInterface{
         return result;
     }
 
-    public String render_template(String templateName)
-        throws FileNotFoundException
-    {
- 
+    @Override
+    public String render_template(String templateName) {
         // the stream holding the file content
-        InputStream is = getClass().getClassLoader().getResourceAsStream("templates/"+templateName);
-          
-        String html = null;
-        try (Scanner scanner = new Scanner(is, StandardCharsets.UTF_8.name())) {
+        String html = "";
+        try {
+            InputStream is = getClass().getClassLoader().getResourceAsStream("templates/"+templateName);
+
+            Scanner scanner = new Scanner(is, StandardCharsets.UTF_8.name());
             html = scanner.useDelimiter("\\A").next();
+        } catch (Exception ex) {
+            html = "";
+            System.out.println("Error: "+ex.getMessage());
         }
+        
 
         return html;
     }
+    
     
     public Mono<Answer> showAll() {
         WebClient webClient = new WebConfig().getWebClient();
@@ -291,15 +285,16 @@ public class SpringClientDemoService implements SpringClientDemoInterface{
     }
 
     @Override
-    public Mono<String> listCerts() {
+    public String listCerts() {
         String html;
         
-        html = render_template_certs(AppSettings.CERTS_PATH);
+        html = render_template_files("list_certs.html","cert",AppSettings.CERTS_PATH);
     
-        return Mono.just(html);
+        //return Mono.just(html);
+        return html;
     }
     
-    private String render_template_certs(String path){
+    private String render_template_files(String templateName, String page,String path){
         
         List<File> files = Stream.of(new File(path).listFiles())
             .filter(file -> !file.isDirectory())
@@ -308,8 +303,7 @@ public class SpringClientDemoService implements SpringClientDemoInterface{
 
         
         String replaceString = "";
-        String html;
-        //LocalDateTime fileLastModified;
+        String html ="";
         
         for(int i=0;i<files.size();i++){
             Long timestamp = files.get(i).lastModified();
@@ -319,23 +313,15 @@ public class SpringClientDemoService implements SpringClientDemoInterface{
             +"    <td> "+files.get(i).getName() +"</td>  <!-- Відображаємо ім'я файлу -->\n"
             +"    <td> "+fileLastModified +"</td>  <!-- Відображаємо дату і час створення файлу -->\n"
             +"    <td>\n"
-            +"        <a href=\"/download_cert/"+files.get(i).getName()+"\" class=\"btn btn-primary\">Скачати</a>  <!-- Посилання для завантаження файлу -->\n"
+            +"        <a href=\"/download/"+page+"/"+files.get(i).getName()+"\" class=\"btn btn-primary\">Скачати</a>  <!-- Посилання для завантаження файлу -->\n"
             +"    </td>\n"
             +"    </tr>\n";
             
         }
 
-            try {
-                html = render_template("list_certs.html");
-            } catch (FileNotFoundException ex) {
-                html = "";
-                System.out.println("Error: "+ex.getMessage());
-            }
-            html = html.replaceAll("<!--@DataTable -->",replaceString);
+        html = render_template(templateName);
+        html = html.replaceAll("<!--@DataTable -->",replaceString);
 
-            
-
-        
         return html;
     }
 
@@ -343,6 +329,102 @@ public class SpringClientDemoService implements SpringClientDemoInterface{
     public Mono<String> downloadFile(String path) {
     
         return Mono.just("");
+    }
+
+    @Override
+    public String listAsic() {
+        List<String> queries = readLogQueries();
+        
+        for(int i=0; i<queries.size();i++){
+            String parametres = queries.get(i);
+            boolean isSuccess = getASIC(parametres);
+            if (isSuccess){
+                
+            }
+        }
+        
+        String html = render_template_files("list_files.html","asic",AppSettings.ASIC_PATH);
+        
+        return html;
+        
+    }
+
+    private List <String> readLogQueries(){
+        List<String> queries = new ArrayList<String>(); 
+        
+        BufferedReader br;
+        try {
+            br = new BufferedReader(new FileReader(AppSettings.ASIC_PATH+"/asic.log"));
+            String line = br.readLine();
+
+            while (line != null) {
+                queries.add(line);
+                line = br.readLine();
+            }
+            br.close();
+        } catch (FileNotFoundException ex) {
+            System.out.println("Error: "+ex.getMessage());
+        } catch (IOException ex) {
+            System.out.println("Error: "+ex.getMessage());
+        }
+        
+        return queries;
+    }
+    
+        private boolean getASIC(String queryId){
+        Path path = Paths.get(AppSettings.ASIC_PATH+"file.asic");
+        boolean result = false;
+        
+        try{
+            WebClient webClient = WebClient.builder()                
+                        .baseUrl(AppSettings.SERVER_PATH) // Set the base URL for the requests
+                        .defaultCookie("cookie-name", "cookie-value") // Set a default cookie for the requests
+                        .defaultHeaders(HttpHeaders-> {
+                        //    HttpHeaders.set(HttpHeaders.CONTENT_TYPE,MediaType.APPLICATION_JSON_VALUE);
+
+                        }) // Set a default header for the requests
+                        .build();
+
+            Flux<DataBuffer> dataBufferFlux = webClient.get()
+                    .uri("signature?"+queryId)
+                    .retrieve().bodyToFlux(DataBuffer.class);
+            DataBufferUtils.write(dataBufferFlux, path, StandardOpenOption.CREATE).block(); //Creates new file or overwrites exisiting file
+            result = true;
+        }catch (Exception ex){
+            System.out.println("Error: "+ex.getMessage());
+            
+        }
+
+        return result;
+    }
+
+    
+    private void loguuid(String uuid){
+        
+        String xRoadInstance = AppSettings.SERVICE_X_ROAD_INSTANCE;
+        String memberClass = AppSettings.SERVICE_MEMBER_CLASS;
+        String memberCode = AppSettings.SERVICE_MEMBER_CODE;
+        String subsystemCode = AppSettings.SERVICE_SUBSYSTEM_CODE;
+    
+        String queryid = "?queryId="+uuid+"&xRoadInstance="+xRoadInstance+"&memberClass="+memberClass+"&memberCode="+memberCode+"&subsystemCode="+subsystemCode;
+        
+        BufferedWriter writer;
+        try {
+            File f = new File(AppSettings.ASIC_PATH+"/asic.log");
+            if(f.exists() && !f.isDirectory()) { 
+                writer = new BufferedWriter(new FileWriter(AppSettings.ASIC_PATH+"/asic.log", true));
+                writer.append(queryid+"\n");
+                writer.close();
+            }else{
+                writer = new BufferedWriter(new FileWriter(AppSettings.ASIC_PATH+"/asic.log", true));
+                writer.write(queryid+"\n");
+                writer.close();
+            }
+
+        } catch (IOException ex) {
+            System.out.println("Неможливо зробити запис в asic-файл: "+ex.getMessage());
+        }
+        
     }
 
 }

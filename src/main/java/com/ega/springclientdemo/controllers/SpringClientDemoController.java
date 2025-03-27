@@ -56,23 +56,22 @@ public class SpringClientDemoController {
         //перехід до сторинкі створення персони
 	public String viewCreateForm() throws FileNotFoundException{
             System.out.println("Create persona page!");
-            return render_template("create_person.html");
+            return service.render_template("create_person.html");
 	}
 
         @GetMapping("/certs")
         //перехід до сторинкі створення персони
-	public Mono<String> listCerts() throws FileNotFoundException{
+	public String listCerts() throws FileNotFoundException{
             System.out.println("Certs page!");
             
             return service.listCerts();
-            //return render_template("list_certs.html");
 	}
 
         @GetMapping("/files")
         //перехід до сторинкі створення персони
-	public String viewFiles() throws FileNotFoundException{
-            System.out.println("Files page!");
-            return render_template("list_files.html");
+	public String listAsic() throws FileNotFoundException{
+            System.out.println("ASIC page!");
+            return service.listAsic();
 	}
         
         @PostMapping("/create")
@@ -137,9 +136,7 @@ public class SpringClientDemoController {
 	public Mono<String> listPersona() throws FileNotFoundException{
             System.out.println("List persona page!");
             
-            //return service.listPersons();
             return service.getHtml("/list");
-            //return service.showAll();
 	}
         
         @PatchMapping("/update")
@@ -174,13 +171,24 @@ public class SpringClientDemoController {
         
         
         //завантаження сертіфікатів
-        @GetMapping("/download_cert/{filename}")
-	public ResponseEntity<InputStreamResource> downloadCert(@PathVariable String filename) throws IOException{
+        @GetMapping("/download/{page}/{filename}")
+	public ResponseEntity<InputStreamResource> downloadFile(@PathVariable String page, @PathVariable String filename) throws IOException{
             String path = "";
-            if(AppSettings.CERTS_PATH.startsWith(".")){
-                path = new File(".").getCanonicalPath()+"/"+AppSettings.CERTS_PATH.substring(2)+"/"+filename;
-            }else{
-                path = new File(".").getCanonicalPath()+"/"+AppSettings.CERTS_PATH+"/"+filename;
+            if(page.equalsIgnoreCase("cert")){
+                if(AppSettings.CERTS_PATH.startsWith(".")){
+                    path = new File(".").getCanonicalPath()+"/"+AppSettings.CERTS_PATH.substring(2)+"/"+filename;
+                }else{
+                    path = new File(".").getCanonicalPath()+"/"+AppSettings.CERTS_PATH+"/"+filename;
+                }
+                
+            }else if(page.equalsIgnoreCase("asic")){
+                if(AppSettings.ASIC_PATH.startsWith(".")){
+                    path = new File(".").getCanonicalPath()+"/"+AppSettings.ASIC_PATH.substring(2)+"/"+filename;
+                }else{
+                    path = new File(".").getCanonicalPath()+"/"+AppSettings.ASIC_PATH+"/"+filename;
+                }
+            }else{    
+                path = new File(".").getCanonicalPath()+"/files/"+filename;
             }
             System.out.println("Download file: "+path);
             File ff = new File(path);
@@ -196,21 +204,6 @@ public class SpringClientDemoController {
                 .body(new InputStreamResource(bin1));
 
         }
-
-    public String render_template(String templateName)
-        throws FileNotFoundException
-    {
- 
-        // the stream holding the file content
-        InputStream is = getClass().getClassLoader().getResourceAsStream("templates/"+templateName);
-          
-        String html = null;
-        try (Scanner scanner = new Scanner(is, StandardCharsets.UTF_8.name())) {
-            html = scanner.useDelimiter("\\A").next();
-        }
-
-        return html;
-    }
 
 }
 

@@ -19,7 +19,10 @@ public interface SpringClientDemoInterface {
    public Mono<Answer> checkPersona(String rnokpp);
    public Mono<Answer> savePersona(Persona persona);
    public Mono<Answer> deletePersona(String rnokpp);
-   public Mono<String> listCerts();
+   public String listCerts();
+   public String listAsic();
    public Mono<String> downloadFile(String path);
+   public String render_template(String templateName);
+   
     
 }
