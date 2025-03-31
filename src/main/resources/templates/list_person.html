@@ -7,7 +7,7 @@
     <title></title>
     <!-- Bootstrap -->
     <link href="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" rel="stylesheet">
-    <link href="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/fontawesome-all.min.css" rel="stylesheet">
+    <link href="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/fontawesome-all.min.css" rel="stylesheet">    
   </head>
   
   
@@ -110,7 +110,7 @@
                     </div>
                 </form>
                 <!-- Блок для повідомлень -->
-                <div id="messageBox" class="alert" role="alert" style="display: none;"></div>
+                <!-- <div id="messageBox" class="alert" role="alert" style="display: none;"></div> -->
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Закрити</button>  <!-- Кнопка для закриття модального вікна -->
@@ -120,6 +120,19 @@
         </div>
     </div>
 </div>
+
+    <!--ONERROR-->
+    <div class="container mt-5">
+        <!-- <h1 class="mb-4">Помилка</h1>  <!-- Заголовок для сторінки з помилкою -->
+        <div class="alert alert-danger" role="alert"  style="display: none;">  <!-- Відображаємо повідомлення про помилку у вигляді червоного блоку -->
+            <h4 class="alert-heading">Сталась помилка!</h4>  <!-- Заголовок повідомлення про помилку -->
+            <p>Записів за заданими параметрами не знайдено.</p>  <!-- Виводимо повідомлення про помилку з переданого змінного error_message -->
+            <hr>
+    <!--        <button class="btn btn-primary" onclick="history.back()">Назад</button>  <!-- Кнопка для повернення на попередню сторінку -->
+        </div>
+    </div>
+                
+
 
 <script>
 let currentItemId;  // Змінна для збереження поточного ID елемента
@@ -270,7 +283,6 @@ function toggleFields(enable) {
     document.getElementById('detailUnzr').disabled = !enable;
 }
 </script>
-
     <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
     <script src="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
