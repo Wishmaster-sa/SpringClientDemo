@@ -18,7 +18,7 @@ webclient.settings.ssl=false # у випадку використання вик
 webclient.settings.certs-path=./certs # шлях до файлів сертіфікатів
 webclient.settings.asic-store=asic # шлях до збереження ASIC контейнерів
 webclient.settings.trust-store-path=keystore/keystore.p12 # шлях до сховища ключів та сертифікатів
-webclient.settings.trust-store-password=localhost #
+webclient.settings.trust-store-password=localhost # пароль до сховища клчів та сертифікатів
 webclient.settings.headers={'UXP-CLIENT': 'test1/GOV/00000088/TEST_SUB888', 'UXP-SERVICE': 'test1/GOV/00000088/TEST_SUB888/springrest'} # хедери (headers) системи "Трембіта"
 ```
 
