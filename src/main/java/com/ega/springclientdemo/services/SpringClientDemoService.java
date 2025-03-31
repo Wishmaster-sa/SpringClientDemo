@@ -10,39 +10,56 @@ import com.ega.springclientdemo.models.Answer;
 import com.ega.springclientdemo.models.AppSettings;
 import com.ega.springclientdemo.models.LogRecord;
 import com.ega.springclientdemo.models.Persona;
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardOpenOption;
+import java.security.KeyManagementException;
+import java.security.KeyStore;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
+import java.security.UnrecoverableKeyException;
+import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Scanner;
 import java.util.TimeZone;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.KeyManagerFactory;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSocketFactory;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.buffer.DataBuffer;
-import org.springframework.core.io.buffer.DataBufferUtils;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 import org.springframework.web.reactive.function.client.WebClient;
-import reactor.core.publisher.Flux;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
 
 
 /**
@@ -88,12 +105,26 @@ public class SpringClientDemoService implements SpringClientDemoInterface{
         return webClient.get()
                 .uri(param)
                 .retrieve()
-                .onStatus(HttpStatusCode::is5xxServerError, clientResponse ->
-                    clientResponse.bodyToMono(String.class)
-                        .flatMap(body -> Mono.error(new RuntimeException("Server Error: " + body))))
+                .onStatus(HttpStatusCode::is5xxServerError, response -> Mono.error( new  RuntimeException ( "Ошибка сервера" ))) 
                 .bodyToMono(Answer.class)                       //перетворюємо на Answer
                 .map(value-> transformToTable(value, html,queryId))     //модіфікуємо сторінку list_person.html
                 .flatMap(response-> Mono.just(response))                //перетворюємо відповідь в Моно String. flatMap тому що на виході об'ект Моно.
+//      .bodyToMono(String.class)
+//                .flatMap(response-> Mono.just("Error: "+response))
+                .onErrorResume(e -> { 
+                String htmlError = transformToTable(Answer.builder().status(Boolean.FALSE).descr(e.getMessage()).build(), html,queryId);     //модіфікуємо сторінку list_person.html
+          System.out.println( "Произошла ошибка: " + e.getMessage()); 
+          return Mono.just( htmlError ); 
+      })
+      //.subscribe(System.out::println, error -> System.out.println( "Ошибка: " + error.getMessage()))
+                //.onStatus(HttpStatusCode::is5xxServerError, response ->response.bodyToMono(String.class).map(Exception::new))
+                //.onStatus(HttpStatus::is5xxServerError, response -> Mono.error(new MyServiceException(response.statusCode())))
+//                                    .Mono.just("Some Error"))
+//                .flatMap(body -> Mono.just("Server Error: " + response.statusCode().toString())))
+    //                    .flatMap(body -> Mono.error(new RuntimeException("Server Error: " + body))))
+//                .bodyToMono(Answer.class)                       //перетворюємо на Answer
+//                .map(value-> transformToTable(value, html,queryId))     //модіфікуємо сторінку list_person.html
+//                .flatMap(response-> Mono.just(response))                //перетворюємо відповідь в Моно String. flatMap тому що на виході об'ект Моно.
                 ;
     }
     
@@ -172,6 +203,9 @@ public class SpringClientDemoService implements SpringClientDemoInterface{
         result = result.replaceAll("<!--@PersonsTable-->", replaceString);
         result = result.replaceAll("history.back()", "history.back(0)");
         result = result.replaceAll("@dataToJson", res);
+        if(!ans.getStatus()){
+            result = showErrorBlock(result, ans.getDescr());
+        }
     
         
         return result;
@@ -203,6 +237,9 @@ public class SpringClientDemoService implements SpringClientDemoInterface{
       .uri("/list")
       .retrieve()
       .bodyToMono(Answer.class)
+      .onErrorContinue(WebClientResponseException.class, (ex, v) -> 
+        Mono.just("Error: "+ex.getMessage()))
+//            .map(it->it.getResult());
       .onErrorResume(Exception.class, e -> Mono.empty()); // Return an empty collection on error
     
     }
@@ -331,16 +368,36 @@ public class SpringClientDemoService implements SpringClientDemoInterface{
         return Mono.just("");
     }
 
+    private String showErrorBlock(String html, String errorMessage){
+        String error = "    <div class=\"container mt-5\">\n" +
+            "        <!--<h1 class=\"mb-4\">Помилка</h1>  <!-- Заголовок для сторінки з помилкою -->\n" +
+            "        <div class=\"alert alert-danger\" role=\"alert\" >  <!-- Відображаємо повідомлення про помилку у вигляді червоного блоку -->\n" +
+            "            <h4 class=\"alert-heading\">Сталась помилка!</h4>  <!-- Заголовок повідомлення про помилку -->\n" +
+            "            <p>"+errorMessage+"</p>  <!-- Виводимо повідомлення про помилку з переданого змінного error_message -->\n" +
+            "            <hr>\n" +
+            "    <!--        <button class=\"btn btn-primary\" onclick=\"history.back()\">Назад</button>  <!-- Кнопка для повернення на попередню сторінку -->\n" +
+            "        </div>\n" +
+            "    </div>\n";
+
+        return html.replaceAll("<!--ONERROR-->", error);
+    }
+    
     @Override
     public String listAsic() {
         List<String> queries = readLogQueries();
-        
+        boolean wasSuccess = false;
         for(int i=0; i<queries.size();i++){
             String parametres = queries.get(i);
             boolean isSuccess = getASIC(parametres);
+            //System.out.println("p="+parametres);
             if (isSuccess){
-                
+                wasSuccess = true;
             }
+            //в любому випадку, якщо були завантажені хоч які файли, очищаємо файл asic.log щоб не скачувати кожного разу теж саме.
+        }
+        
+        if(wasSuccess){
+            DeleteFile(AppSettings.ASIC_PATH+"/asic.log");
         }
         
         String html = render_template_files("list_files.html","asic",AppSettings.ASIC_PATH);
@@ -348,6 +405,15 @@ public class SpringClientDemoService implements SpringClientDemoInterface{
         return html;
         
     }
+    //Після загрузки переліку контейнерів видаляемо файл з неотриманними контейнерами
+    private void DeleteFile (String filename){
+        File file = new File(filename);
+
+      	// Delete the File
+        file.delete();
+        
+    }
+    
 
     private List <String> readLogQueries(){
         List<String> queries = new ArrayList<String>(); 
@@ -371,31 +437,96 @@ public class SpringClientDemoService implements SpringClientDemoInterface{
         return queries;
     }
     
-        private boolean getASIC(String queryId){
-        Path path = Paths.get(AppSettings.ASIC_PATH+"file.asic");
-        boolean result = false;
+    private boolean getASIC(String queryId){
+        boolean responseResult = false;
         
-        try{
-            WebClient webClient = WebClient.builder()                
-                        .baseUrl(AppSettings.SERVER_PATH) // Set the base URL for the requests
-                        .defaultCookie("cookie-name", "cookie-value") // Set a default cookie for the requests
-                        .defaultHeaders(HttpHeaders-> {
-                        //    HttpHeaders.set(HttpHeaders.CONTENT_TYPE,MediaType.APPLICATION_JSON_VALUE);
+        InputStream is = null;
+        String result = "";
 
-                        }) // Set a default header for the requests
-                        .build();
+        
+        Map<String,String> headers = new HashMap<>();
+        headers.put("Content-Type", "application/octet-stream");
 
-            Flux<DataBuffer> dataBufferFlux = webClient.get()
-                    .uri("signature?"+queryId)
-                    .retrieve().bodyToFlux(DataBuffer.class);
-            DataBufferUtils.write(dataBufferFlux, path, StandardOpenOption.CREATE).block(); //Creates new file or overwrites exisiting file
-            result = true;
-        }catch (Exception ex){
-            System.out.println("Error: "+ex.getMessage());
+        try {
+            // Step 1: Load the certificate from PEM file or use JKS
+            // (If you used PKCS#12, uncomment the next block)
+            KeyStore ks = KeyStore.getInstance("PKCS12");
+            ks.load(new FileInputStream(AppSettings.TRUSTSTORE_PATH), AppSettings.TRUSTSTORE_PASSWORD.toCharArray());
+
+            // Step 2: Create an SSL context with your certificate
+            SSLContext sslContext = SSLContext.getInstance("TLS");
+            KeyManagerFactory kmf = KeyManagerFactory.getInstance("SunX509");
+            kmf.init(ks, AppSettings.TRUSTSTORE_PASSWORD.toCharArray());
+            TrustManager[] trustAllCerts = new TrustManager[]{new X509TrustManager() {
+                @Override
+                public void checkClientTrusted(X509Certificate[] certs, String authType) {}
+                @Override
+                public void checkServerTrusted(X509Certificate[] certs, String authType) {}
+                @Override
+                public X509Certificate[] getAcceptedIssuers() { return new X509Certificate[0]; }
+            }};
+
+            sslContext.init(kmf.getKeyManagers(), trustAllCerts, new SecureRandom());
+
+            // Step 3: Configure the SSL socket factory
+            SSLSocketFactory sslSocketFactory = sslContext.getSocketFactory();
+
+            // Create an URL connection using your custom SSL context
+            //URL url = new URL("https://192.168.99.92/signature?queryId=79881fc2-7a83-4e87-be43-b938760dc032&xRoadInstance=test1&memberClass=GOV&memberCode=00000088&subsystemCode=SUB_SERVICE");
+            String hostname = AppSettings.SERVER_PATH.toUpperCase();
+            if(!hostname.contains("HTTPS")){
+                hostname = hostname.replaceAll("HTTP://", "HTTPS://");
+            }
+            System.out.println(hostname);
+            URL url = new URL(hostname+"/signature"+queryId);
+
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            if (connection instanceof HttpsURLConnection) {
+                ((HttpsURLConnection) connection).setSSLSocketFactory(sslSocketFactory);
+            }
+
+          // Set request method to GET
+            connection.setRequestMethod("GET");
             
-        }
+            for(String key: headers.keySet()) {
+                connection.setRequestProperty(key, headers.get(key));
+              }
+            
+            // Connect
+            int responseCode = connection.getResponseCode();
+            //System.out.println("Response Code: " + responseCode);
 
-        return result;
+            
+            // Check if the request was successful
+            if (responseCode == HttpURLConnection.HTTP_OK) {
+                SaveAttachedFile(connection);
+                
+                responseResult = true;
+            } else {
+                result = "Request failed. Response code: " + responseCode;
+            }
+            // Disconnect
+            connection.disconnect();
+ 
+            } catch (MalformedURLException ex) {
+                result = "ERROR #0001: "+ex.getMessage();
+            } catch (IOException ex) {
+                result = "ERROR: #0002"+ex.getMessage();
+            }   catch (KeyStoreException ex) {
+                result = "ERROR: #0003"+ex.getMessage();
+            } catch (NoSuchAlgorithmException ex) {
+                result = "ERROR: #0004"+ex.getMessage();
+            } catch (CertificateException ex) {
+                result = "ERROR: #0005"+ex.getMessage();
+            } catch (UnrecoverableKeyException ex) {
+                result = "ERROR: #0006"+ex.getMessage();
+            } catch (KeyManagementException ex) {
+                result = "ERROR: #0007"+ex.getMessage();
+            }
+
+            System.out.println(result);
+
+        return responseResult;
     }
 
     
@@ -426,6 +557,45 @@ public class SpringClientDemoService implements SpringClientDemoInterface{
         }
         
     }
+    
+    private void SaveAttachedFile(HttpURLConnection connection){
+        BufferedInputStream inputStream = null;
+        String result = "";
+        try {
+            // Get the input stream from the connection
+            inputStream = new BufferedInputStream(connection.getInputStream());
+            String filename = connection.getHeaderField("Content-Disposition").replaceAll("filename=", "").replaceAll("\"", "");
+            if(filename.isEmpty()){
+                LocalDateTime dt = LocalDateTime.now();
+                filename = ""+dt.getYear()+dt.getMonth()+dt.getDayOfMonth()+dt.getHour()+dt.getMinute()+dt.getSecond()+dt.getNano()+".zip";
+            }   String outputFilePath = AppSettings.ASIC_PATH+"/"+filename;
+            // Create output file
+            FileOutputStream fileOutputStream = new FileOutputStream(outputFilePath);
+            BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(fileOutputStream);
+            // Read bytes and write to file
+            byte[] buffer = new byte[4096];
+            int bytesRead;
+            while ((bytesRead = inputStream.read(buffer)) != -1) {
+                bufferedOutputStream.write(buffer, 0, bytesRead);
+            }   // Close streams
+            bufferedOutputStream.close();
+            inputStream.close();
+            //System.out.println("File saved to: " + outputFilePath);
+            
+            result = "File saved to: " + outputFilePath;
+        } catch (IOException ex) {
+                result = "ERROR: #0008"+ex.getMessage();
+        } finally {
+            try {
+                inputStream.close();
+            } catch (IOException ex) {
+                result = "ERROR: #0008"+ex.getMessage();
+            }
+        }
+        
+        System.out.println(result);
+    }
+    
 
 }
 
