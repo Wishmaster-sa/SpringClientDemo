@@ -65,7 +65,7 @@ public class Persona implements Serializable{
         this.CheckedRequest = LocalDateTime.of(1, 1, 1,0,0,0);
     }
     
-    // перевизначення функції отримання віку. Отримуємо вік як різницю кількості років між
+    // Перевизначення функції отримання віку. Отримуємо вік як різницю кількості років між
     // поточним роком та роком народження.
     public int getAge(){
         if((birthDate == null)||(birthDate==LocalDate.of(1, 1, 1))){
