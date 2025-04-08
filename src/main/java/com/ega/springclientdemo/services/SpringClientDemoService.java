@@ -105,7 +105,7 @@ public class SpringClientDemoService implements SpringClientDemoInterface{
         return webClient.get()
                 .uri(param)
                 .retrieve()
-                .onStatus(HttpStatusCode::is5xxServerError, response -> Mono.error( new  RuntimeException ( "Ошибка сервера" ))) 
+                .onStatus(HttpStatusCode::is5xxServerError, response -> Mono.error( new  RuntimeException ( "Помилка серверу" ))) 
                 .bodyToMono(Answer.class)                       //перетворюємо на Answer
                 .map(value-> transformToTable(value, html,queryId))     //модіфікуємо сторінку list_person.html
                 .flatMap(response-> Mono.just(response))                //перетворюємо відповідь в Моно String. flatMap тому що на виході об'ект Моно.
@@ -113,10 +113,10 @@ public class SpringClientDemoService implements SpringClientDemoInterface{
 //                .flatMap(response-> Mono.just("Error: "+response))
                 .onErrorResume(e -> { 
                 String htmlError = transformToTable(Answer.builder().status(Boolean.FALSE).descr(e.getMessage()).build(), html,queryId);     //модіфікуємо сторінку list_person.html
-          System.out.println( "Произошла ошибка: " + e.getMessage()); 
+          System.out.println( "Відбулась помилка: " + e.getMessage()); 
           return Mono.just( htmlError ); 
       })
-      //.subscribe(System.out::println, error -> System.out.println( "Ошибка: " + error.getMessage()))
+      //.subscribe(System.out::println, error -> System.out.println( "Помилка: " + error.getMessage()))
                 //.onStatus(HttpStatusCode::is5xxServerError, response ->response.bodyToMono(String.class).map(Exception::new))
                 //.onStatus(HttpStatus::is5xxServerError, response -> Mono.error(new MyServiceException(response.statusCode())))
 //                                    .Mono.just("Some Error"))
