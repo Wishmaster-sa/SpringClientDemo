@@ -110,12 +110,13 @@
                     </div>
                 </form>
                 <!-- Блок для повідомлень -->
-                <!-- <div id="messageBox" class="alert" role="alert" style="display: none;"></div> -->
+                <div id="messageBox" class="alert" role="alert" style="display: none;"></div>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Закрити</button>  <!-- Кнопка для закриття модального вікна -->
                 <button type="button" class="btn btn-primary" id="editButton" onclick="editDetails()">Редагувати</button>  <!-- Кнопка для редагування -->
                 <button type="button" class="btn btn-danger" id="deleteButton" onclick="deleteItem()">Видалити</button>  <!-- Кнопка для видалення -->
+                <button type="button" class="btn btn-primary" id="checkButton" onclick="checkItem()">Перевірити</button>  <!-- Кнопка для перевірки персони -->
             </div>
         </div>
     </div>
@@ -271,6 +272,49 @@ function deleteItem() {
         messageBox.style.display = 'block';
     });
 }
+
+function checkItem() {
+    const rnokpp = document.getElementById('detailRnokpp').value;
+
+    // Відправка запиту на видалення
+    fetch('/check', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ rnokpp: rnokpp })
+    })
+    .then(response => {
+        const messageBox = document.getElementById('messageBox');
+        if (response.status === 200) {
+            response.json().then(data => {
+                    if(data.status===true){
+                        messageBox.textContent = `Успіх: ${data.result}`;  // Відображаємо повідомлення про успіх
+                        messageBox.className = 'alert alert-success';
+                        messageBox.style.display = 'block';
+                    }else{
+                        messageBox.textContent = `Виникла помилка: ${data.descr}`;  // Відображаємо повідомлення про помилку
+                        messageBox.className = 'alert alert-danger';
+                        messageBox.style.display = 'block';
+                    }
+            });
+        } else {
+            response.json().then(data => {
+                messageBox.textContent = `Виникла помилка: ${JSON.stringify(data)}`;  // Повідомлення про помилку
+                messageBox.className = 'alert alert-danger';
+                messageBox.style.display = 'block';
+            });
+        }
+    })
+    .catch(error => {
+        const messageBox = document.getElementById('messageBox');
+        messageBox.textContent = `Виникла помилка: ${error.message}`;  // Повідомлення про помилку
+        messageBox.className = 'alert alert-danger';
+        messageBox.style.display = 'block';
+    });
+}
+
+
 
 function toggleFields(enable) {
     document.getElementById('detailName').disabled = !enable;

@@ -160,6 +160,20 @@ public class SpringClientDemoController {
             
             return ans;
         }
+
+        @PostMapping("/check")
+	public Mono<Answer> checkPersona(@RequestBody String data) {
+            JSONObject js = new JSONObject(data);
+            Mono<Answer> ans;
+            System.out.println("===============================CHECK PERSONA==============================================");
+            System.out.println(data);
+            System.out.println(js.toString());
+            ans = service.checkPersona(js.getString("rnokpp"));
+            System.out.println(ans.toString());
+            
+            return ans;
+        }
+
         
 	@GetMapping("/notify")
 	public ResponseEntity<Void> notification() throws Exception {
