@@ -36,6 +36,9 @@ public class AppSettings implements InitializingBean{
     @Value("${webclient.settings.ssl}")
     private boolean usessl;
 
+    @Value("${webclient.settings.isDocker}")
+    private boolean isDocker;
+
     @Value("${webclient.settings.trust-store-path}")
     private String truststore;
 
@@ -97,6 +100,8 @@ public class AppSettings implements InitializingBean{
     public static String ASIC_PATH;
 
     public static boolean USE_SSL;
+
+    public static boolean IS_DOCKER;
     
     public static String TRUSTSTORE_PATH;
 
@@ -112,6 +117,7 @@ public class AppSettings implements InitializingBean{
         AppSettings.LOG_LEVEL               = loglevel;
         AppSettings.CERTS_PATH              = certspath;
         AppSettings.USE_SSL                 = usessl;
+        AppSettings.IS_DOCKER               = isDocker;
         AppSettings.TRUSTSTORE_PATH         = truststore;
         AppSettings.TRUSTSTORE_PASSWORD     = truststore_pass;
         AppSettings.ASIC_PATH               = asicpath;

@@ -26,6 +26,8 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.security.KeyManagementException;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
@@ -109,23 +111,11 @@ public class SpringClientDemoService implements SpringClientDemoInterface{
                 .bodyToMono(Answer.class)                       //перетворюємо на Answer
                 .map(value-> transformToTable(value, html,queryId))     //модіфікуємо сторінку list_person.html
                 .flatMap(response-> Mono.just(response))                //перетворюємо відповідь в Моно String. flatMap тому що на виході об'ект Моно.
-//      .bodyToMono(String.class)
-//                .flatMap(response-> Mono.just("Error: "+response))
                 .onErrorResume(e -> { 
                 String htmlError = transformToTable(Answer.builder().status(Boolean.FALSE).descr(e.getMessage()).build(), html,queryId);     //модіфікуємо сторінку list_person.html
           System.out.println( "Произошла ошибка: " + e.getMessage()); 
           return Mono.just( htmlError ); 
-      })
-      //.subscribe(System.out::println, error -> System.out.println( "Ошибка: " + error.getMessage()))
-                //.onStatus(HttpStatusCode::is5xxServerError, response ->response.bodyToMono(String.class).map(Exception::new))
-                //.onStatus(HttpStatus::is5xxServerError, response -> Mono.error(new MyServiceException(response.statusCode())))
-//                                    .Mono.just("Some Error"))
-//                .flatMap(body -> Mono.just("Server Error: " + response.statusCode().toString())))
-    //                    .flatMap(body -> Mono.error(new RuntimeException("Server Error: " + body))))
-//                .bodyToMono(Answer.class)                       //перетворюємо на Answer
-//                .map(value-> transformToTable(value, html,queryId))     //модіфікуємо сторінку list_person.html
-//                .flatMap(response-> Mono.just(response))                //перетворюємо відповідь в Моно String. flatMap тому що на виході об'ект Моно.
-                ;
+      });
     }
     
     public String transformToTable(Answer ans, String html,String queryId){
@@ -327,20 +317,23 @@ public class SpringClientDemoService implements SpringClientDemoInterface{
         
         html = render_template_files("list_certs.html","cert",AppSettings.CERTS_PATH);
     
-        //return Mono.just(html);
         return html;
     }
     
     private String render_template_files(String templateName, String page,String path){
+
+        String replaceString = "";
+        String html ="";
+        
+        if(path.isEmpty()){
+            html = render_template(templateName);
+            return html;
+        }
         
         List<File> files = Stream.of(new File(path).listFiles())
             .filter(file -> !file.isDirectory())
-            //.map(File::getName)
             .collect(Collectors.toList());
 
-        
-        String replaceString = "";
-        String html ="";
         
         for(int i=0;i<files.size();i++){
             Long timestamp = files.get(i).lastModified();
@@ -386,6 +379,14 @@ public class SpringClientDemoService implements SpringClientDemoInterface{
     public String listAsic() {
         List<String> queries = readLogQueries();
         boolean wasSuccess = false;
+        
+        //якщо клієнт працює в докер, то цю функціональність вимикаєм.
+        if(isRunningInsideDocker()){
+            String html = render_template_files("list_files.html","asic","");
+            html = html.replaceAll("<!--ONERROR-->", GetErrorBlock("Завантаженя ASIC контейнерів не передбачено коли программа працює в Docker!"));
+            return html;
+        }
+        
         for(int i=0; i<queries.size();i++){
             String parametres = queries.get(i);
             boolean isSuccess = getASIC(parametres);
@@ -414,6 +415,19 @@ public class SpringClientDemoService implements SpringClientDemoInterface{
         
     }
     
+    private String GetErrorBlock(String errorMessage){
+        String error = "    <div class=\"container mt-5\">\n" +
+            "        <!--<h1 class=\"mb-4\">Помилка</h1>  <!-- Заголовок для сторінки з помилкою -->\n" +
+            "        <div class=\"alert alert-danger\" role=\"alert\" >  <!-- Відображаємо повідомлення про помилку у вигляді червоного блоку -->\n" +
+            "            <h4 class=\"alert-heading\">Сталась помилка!</h4>  <!-- Заголовок повідомлення про помилку -->\n" +
+            "            <p>"+errorMessage+"</p>  <!-- Виводимо повідомлення про помилку з переданого змінного error_message -->\n" +
+            "            <hr>\n" +
+            "    <!--        <button class=\"btn btn-primary\" onclick=\"history.back()\">Назад</button>  <!-- Кнопка для повернення на попередню сторінку -->\n" +
+            "        </div>\n" +
+            "    </div>\n";
+
+        return error;
+    }
 
     private List <String> readLogQueries(){
         List<String> queries = new ArrayList<String>(); 
@@ -449,7 +463,6 @@ public class SpringClientDemoService implements SpringClientDemoInterface{
 
         try {
             // Step 1: Load the certificate from PEM file or use JKS
-            // (If you used PKCS#12, uncomment the next block)
             KeyStore ks = KeyStore.getInstance("PKCS12");
             ks.load(new FileInputStream(AppSettings.TRUSTSTORE_PATH), AppSettings.TRUSTSTORE_PASSWORD.toCharArray());
 
@@ -580,7 +593,6 @@ public class SpringClientDemoService implements SpringClientDemoInterface{
             }   // Close streams
             bufferedOutputStream.close();
             inputStream.close();
-            //System.out.println("File saved to: " + outputFilePath);
             
             result = "File saved to: " + outputFilePath;
         } catch (IOException ex) {
@@ -596,6 +608,10 @@ public class SpringClientDemoService implements SpringClientDemoInterface{
         System.out.println(result);
     }
     
+    public Boolean isRunningInsideDocker() {
+
+       return AppSettings.IS_DOCKER;
+    }    
 
 }
 
